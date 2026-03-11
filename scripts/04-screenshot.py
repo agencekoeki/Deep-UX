@@ -89,7 +89,11 @@ def perform_form_login(page, auth_config):
 def is_excluded(url_or_path, exclude_urls):
     """Vérifie si une URL est dans la liste d'exclusion."""
     for pattern in exclude_urls:
-        if pattern in url_or_path:
+        # Match exact
+        if url_or_path == pattern:
+            return True
+        # Match début de segment : /api exclut /api/users mais pas /api-documentation
+        if url_or_path.startswith(pattern.rstrip('/') + '/'):
             return True
     return False
 
