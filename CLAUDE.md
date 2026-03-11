@@ -21,7 +21,7 @@ Phase 5 — Rapports         → report-human.md, report-cc-tasks.json, report-c
 2. **Parallèle dans une phase** — les agents DANS une même phase peuvent tourner en parallèle
 3. **Reprise automatique** — si relancé, reprend à la dernière phase incomplète
 4. **Sauvegarde incrémentale** — chaque fichier est écrit dès qu'il est prêt
-5. **Anti-drift** — chaque agent lit `docs/anti-drift-rules.md` et son vocabulaire disciplinaire
+5. **Anti-drift** — chaque agent charge les skills `anti-drift` + sa skill disciplinaire (les `docs/` restent comme référence longue forme)
 6. **Grounding fonctionnel** — aucune recommandation fonctionnelle sans `capability_id`
 
 ### Slash commands
@@ -48,6 +48,14 @@ Non bloquant — l'audit continue même si la couverture est partielle.
 ### 17-contradiction-detector
 Spawné en Phase 4, en parallèle de 13-consistency-checker et 14-functional-gap-analyst.
 Son output est intégré dans le rapport final.
+
+### 18-wording-auditor (outputs transversaux)
+Spawné en Phase 3 pour chaque écran. Produit en plus un output transversal `.audit/wording-corpus.json`
+qui agrège la terminologie cross-vues. Ce fichier est consommé en Phase 4 par le consistency-checker.
+
+### 19-ia-auditor (output transversal)
+Spawné une seule fois en Phase 3 (après tous les écrans). Produit `.audit/screen-audits/ia-audit.json`
+qui reconstruit l'arbre de navigation et mesure la distance tâche/accès. Consommé en Phase 4 et Phase 5.
 
 ### 20-contextual-gaps-auditor
 Spawné en Phase 4, en parallèle des autres agents Phase 4.

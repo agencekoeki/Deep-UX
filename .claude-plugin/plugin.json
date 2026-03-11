@@ -1,6 +1,6 @@
 {
   "name": "deep-ux",
-  "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, and IHM disciplines.",
+  "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, IHM, and Wording disciplines.",
   "version": "0.5.0",
   "author": {
     "name": "Kōeki Agency",

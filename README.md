@@ -41,6 +41,8 @@ Point deep-ux at any web project. It runs on its own. At the end, you get:
 | Personas | No | Built from code + designer interview |
 | Cross-screen consistency | No | Dedicated Phase 4 agent |
 | Functional recommendations | Invented | Anchored to capabilities.json |
+| Automated measurement | No | 8 scripts: axe-core a11y, DOM inventory, touch targets, contrast ratios, keyboard nav, readability, semantic structure, motion audit |
+| Structured knowledge | Implicit | 10 skills: anti-drift rules, scoring anchors, JSON conventions, 6 discipline vocabularies |
 | Run time | A few minutes | Can run for hours unattended |
 
 ---
@@ -83,9 +85,10 @@ PHASE 3 — Screen-by-screen audit (automatic, parallel)
   Each screen is analyzed independently by a dedicated agent.
   Input: screenshot + source code + personas + capabilities.
 
-PHASE 4 — Cross-screen consistency (automatic)
-  One agent re-reads all screen audits and looks for contradictions,
-  terminology inconsistencies, pattern breaks.
+PHASE 4 — Cross-screen consistency (automatic, parallel)
+  4 agents run in parallel: consistency checker, functional gap analyst,
+  contradiction detector, and contextual gaps auditor. They consume all
+  screen audits + transversal outputs (wording-corpus, IA audit).
 
 PHASE 5 — Reports (automatic)
   Three formats: human-readable report, CC work tickets, client HTML report.
@@ -141,6 +144,8 @@ Everything lands in `.audit/` (auto-gitignored):
 - Claude Code with Bash access
 - Python 3.8+
 - Playwright (`pip install playwright && playwright install chromium`)
+- Pillow (`pip install Pillow`) — optional, non-blocking: enables pixel-sampled contrast measurement. Without it, `13-contrast-real.py` is skipped
+- pyphen (`pip install pyphen`) — optional, non-blocking: enables accurate French syllable counting. Without it, `10-readability.py` uses a heuristic fallback
 - Target project accessible locally or via URL
 
 ---
@@ -213,6 +218,8 @@ Vous pointez deep-ux sur n'importe quel projet web. Il tourne tout seul. À la f
 | Personas | Non | Construits à partir du code + interview |
 | Cohérence inter-écrans | Non | Agent dédié Phase 4 |
 | Recommandations fonctionnelles | Inventées | Ancrées sur capabilities.json |
+| Mesure automatisée | Non | 8 scripts : a11y axe-core, inventaire DOM, cibles tactiles, ratios contraste, navigation clavier, lisibilité, structure sémantique, audit motion |
+| Connaissance structurée | Implicite | 10 skills : règles anti-drift, étalons de score, conventions JSON, 6 vocabulaires disciplinaires |
 | Durée | Quelques minutes | Peut tourner des heures sans supervision |
 
 ---
@@ -255,9 +262,10 @@ PHASE 3 — Audit par écran (automatique, parallèle)
   Chaque écran est analysé indépendamment par un agent dédié.
   Input : screenshot + code source + personas + capabilities.
 
-PHASE 4 — Cohérence inter-écrans (automatique)
-  Un agent relit tous les audits d'écrans et cherche les contradictions,
-  incohérences de terminologie, ruptures de patterns.
+PHASE 4 — Cohérence inter-écrans (automatique, parallèle)
+  4 agents tournent en parallèle : cohérence, écarts fonctionnels,
+  détection de contradictions, et gaps contextuels. Ils consomment tous
+  les audits d'écrans + les outputs transversaux (wording-corpus, audit IA).
 
 PHASE 5 — Rapports (automatique)
   Trois formats : rapport humain lisible, tickets CC, rapport client HTML.
@@ -313,6 +321,8 @@ Tout est dans `.audit/` (gitignored automatiquement) :
 - Claude Code avec accès Bash
 - Python 3.8+
 - Playwright (`pip install playwright && playwright install chromium`)
+- Pillow (`pip install Pillow`) — optionnel, non bloquant : active la mesure de contraste pixel. Sans lui, `13-contrast-real.py` est ignoré
+- pyphen (`pip install pyphen`) — optionnel, non bloquant : active la syllabification française exacte. Sans lui, `10-readability.py` utilise une estimation heuristique
 - Le projet cible doit être accessible localement ou via URL
 
 ---
