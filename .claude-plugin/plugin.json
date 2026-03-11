@@ -1,7 +1,7 @@
 {
   "name": "deep-ux",
-  "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, and IHM disciplines.",
-  "version": "0.2.0",
+  "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, IHM, and Wording disciplines.",
+  "version": "0.5.0",
   "author": {
     "name": "Kōeki Agency",
     "url": "https://koeki.fr"
@@ -9,6 +9,24 @@
   "homepage": "https://github.com/koeki-agency/deep-ux",
   "license": "MIT",
   "agent": "00-orchestrator",
+  "scripts": [
+    "00-bootstrap.sh",
+    "01-check-deps.sh",
+    "02-discover.py",
+    "03-build-page-map.py",
+    "04-screenshot.py",
+    "05-extract-tokens.py",
+    "06-export-session-helper.py",
+    "00b-estimate-run.py",
+    "07-a11y-scan.py",
+    "08-dom-inventory.py",
+    "09-semantic-structure.py",
+    "10-readability.py",
+    "11-touch-targets.py",
+    "12-nav-keyboard.py",
+    "13-contrast-real.py",
+    "14-motion-audit.py"
+  ],
   "agents": [
     "00-orchestrator",
     "00b-quality-gate",
@@ -28,13 +46,22 @@
     "14-functional-gap-analyst",
     "15-report-generator",
     "16-coverage-auditor",
-    "17-contradiction-detector"
+    "17-contradiction-detector",
+    "18-wording-auditor",
+    "19-ia-auditor",
+    "20-contextual-gaps-auditor"
   ],
-  "commands": [
-    "run",
-    "diff"
-  ],
+  "commands": ["run", "diff"],
   "skills": [
-    "ux-audit"
+    "ux-audit",
+    "anti-drift",
+    "scoring",
+    "json-output",
+    "graphisme",
+    "ui",
+    "ux",
+    "webdesign",
+    "ihm",
+    "wording"
   ]
 }

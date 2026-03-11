@@ -25,9 +25,11 @@ FILE_EXTENSIONS = {
     "scss": [".scss", ".sass"],
     "js": [".js", ".mjs"],
     "jsx": [".jsx"],
+    "ts": [".ts"],
     "tsx": [".tsx"],
     "vue": [".vue"],
     "php": [".php"],
+    "py": [".py"],
 }
 
 IGNORE_DIRS = {

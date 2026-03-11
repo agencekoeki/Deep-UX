@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DOM Inventory",
+  "description": "Inventaire de tous les éléments interactifs d'une page avec positions et tailles réelles",
+  "type": "object",
+  "required": ["page_id", "url", "inventoried_at", "viewport", "elements"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "inventoried_at": { "type": "string", "format": "date-time" },
+    "viewport": {
+      "type": "object",
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "tag", "type", "selector", "position", "visible_text"],
+        "properties": {
+          "id": { "type": "string", "description": "Identifiant séquentiel elem-001, elem-002..." },
+          "tag": { "type": "string", "description": "button, a, input, select, textarea..." },
+          "type": {
+            "type": "string",
+            "enum": ["button", "link", "input_text", "input_checkbox", "input_radio",
+                     "input_select", "input_file", "textarea", "other_interactive"]
+          },
+          "selector": { "type": "string" },
+          "position": {
+            "type": "object",
+            "required": ["x", "y", "width", "height"],
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "width": { "type": "number" },
+              "height": { "type": "number" }
+            }
+          },
+          "visible_text": { "type": "string", "description": "Texte visible de l'élément" },
+          "aria_label": { "type": ["string", "null"] },
+          "aria_role": { "type": ["string", "null"] },
+          "disabled": { "type": "boolean" },
+          "in_viewport": { "type": "boolean", "description": "Visible sans scroll au chargement" },
+          "tab_index": { "type": ["integer", "null"] }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_interactive": { "type": "integer" },
+        "buttons_count": { "type": "integer" },
+        "links_count": { "type": "integer" },
+        "inputs_count": { "type": "integer" },
+        "above_fold_count": { "type": "integer" }
+      }
+    }
+  }
+}

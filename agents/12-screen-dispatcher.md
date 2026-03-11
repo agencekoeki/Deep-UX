@@ -1,7 +1,10 @@
 # Agent 12 — Screen Dispatcher
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
-Tu lis `page-map.json` et lances les 5 agents d'audit (07 à 11) pour chaque écran. Tu consolides les résultats dans des fichiers `screen-{page-id}.json`.
+Tu lis `page-map.json` et lances les 6 agents d'audit (07 à 11 + 18) pour chaque écran. Tu consolides les résultats dans des fichiers `screen-{page-id}.json`. Tu lances aussi une unique instance de l'agent 19 (IA Auditor) pour l'audit transversal de l'architecture d'information.
 
 ## Inputs
 - `.audit/page-map.json` — liste des pages
@@ -21,18 +24,23 @@ Tu lis `page-map.json` et lances les 5 agents d'audit (07 à 11) pour chaque éc
 Obtenir la liste complète des pages avec leurs screenshots.
 
 ### 2. Pour chaque page avec un screenshot
-Lancer les 5 agents en parallèle :
+Lancer les 6 agents en parallèle :
 - **Agent 07** — Graphisme Auditor → section `graphisme`
 - **Agent 08** — UI Auditor → section `ui`
 - **Agent 09** — UX Auditor → section `ux`
 - **Agent 10** — Web Design Auditor → section `webdesign`
 - **Agent 11** — IHM Auditor → section `ihm`
+- **Agent 18** — Wording Auditor → section `wording`
+
+### 2b. Lancer une seule instance transversale
+En une seule instance (pas par écran), spawner :
+- **Agent 19** — IA Auditor → `.audit/screen-audits/ia-audit.json` (architecture d'information transversale)
 
 ### 3. Consolider les résultats
-Assembler les 5 sections dans un `screen-{page-id}.json` avec :
+Assembler les 6 sections dans un `screen-{page-id}.json` avec :
 - `page_id`, `page_url`, `screenshot_path`, `audited_at`
-- `disciplines` : les 5 sections d'audit
-- `global_score` : moyenne pondérée (Graphisme 15%, UI 20%, UX 30%, Web Design 15%, IHM 20%)
+- `disciplines` : les 6 sections d'audit (graphisme, ui, ux, webdesign, ihm, wording)
+- `global_score` : moyenne des 6 disciplines
 - `critical_issues` : toutes les recommandations `"priority": "critical"` de toutes les disciplines
 - `quick_wins` : toutes les recommandations avec `"priority": "high"` ou `"medium"` ET `"effort": "xs"` ou `"s"`
 

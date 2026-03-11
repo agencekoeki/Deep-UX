@@ -21,6 +21,11 @@ PROJECT_MAP_PATH = os.path.join(AUDIT_DIR, "project-map.json")
 OUTPUT_PATH = os.path.join(AUDIT_DIR, "page-map.json")
 
 
+def is_parameterized(route):
+    """Détecte si une route contient des paramètres dynamiques (:id, [slug], etc.)."""
+    return bool(re.search(r":[a-zA-Z_]|[\[\{]", route))
+
+
 def guess_page_type(path_or_url):
     """Devine le type de page d'après son nom."""
     path_lower = path_or_url.lower()
@@ -78,6 +83,7 @@ def extract_routes_from_react(project_root, files):
                         "file_source": file_source,
                         "requires_auth": guess_requires_auth(route, file_source),
                         "page_type": guess_page_type(route),
+                        "parameterized": is_parameterized(route),
                         "screenshot_path": None,
                         "audited": False,
                     })
@@ -100,6 +106,7 @@ def extract_routes_from_react(project_root, files):
                         "file_source": src_file,
                         "requires_auth": guess_requires_auth(route),
                         "page_type": guess_page_type(route),
+                        "parameterized": is_parameterized(route),
                         "screenshot_path": None,
                         "audited": False,
                     })
@@ -134,6 +141,7 @@ def extract_routes_from_vue(project_root, files):
                         "file_source": file_source,
                         "requires_auth": guess_requires_auth(route),
                         "page_type": guess_page_type(route),
+                        "parameterized": is_parameterized(route),
                         "screenshot_path": None,
                         "audited": False,
                     })
@@ -157,6 +165,7 @@ def extract_routes_from_vue(project_root, files):
                             "file_source": candidate,
                             "requires_auth": guess_requires_auth(route),
                             "page_type": guess_page_type(route),
+                            "parameterized": is_parameterized(route),
                             "screenshot_path": None,
                             "audited": False,
                         })
@@ -181,6 +190,7 @@ def extract_pages_static(project_root, files):
             "file_source": html_file,
             "requires_auth": False,
             "page_type": guess_page_type(html_file),
+            "parameterized": is_parameterized(route),
             "screenshot_path": None,
             "audited": False,
         })
@@ -202,6 +212,7 @@ def extract_pages_php(project_root, files):
             "file_source": php_file,
             "requires_auth": guess_requires_auth(php_file),
             "page_type": guess_page_type(php_file),
+            "parameterized": is_parameterized(route),
             "screenshot_path": None,
             "audited": False,
         })

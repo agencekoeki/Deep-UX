@@ -1,5 +1,8 @@
 # Agent 08 — UI Auditor (Discipline 2)
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `ui` / `scoring` / `json-output`
+
 ## Discipline : UI (User Interface Design)
 Audite le système de composants, les états interactifs, la cohérence du design system.
 

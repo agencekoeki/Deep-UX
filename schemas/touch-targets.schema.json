@@ -1,0 +1,71 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Touch Targets Audit",
+  "description": "Taille des cibles interactives mesurée en mode mobile viewport",
+  "type": "object",
+  "required": ["page_id", "url", "measured_at", "viewport_mobile", "targets"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "measured_at": { "type": "string", "format": "date-time" },
+    "viewport_mobile": {
+      "type": "object",
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      }
+    },
+    "threshold_px": {
+      "type": "integer",
+      "default": 44,
+      "description": "Seuil en pixels CSS — 44px = standard iOS/Google Material"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "selector", "tag", "visible_text", "width_px", "height_px", "passes_threshold"],
+        "properties": {
+          "id": { "type": "string" },
+          "selector": { "type": "string" },
+          "tag": { "type": "string" },
+          "visible_text": { "type": "string" },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          },
+          "width_px": { "type": "number" },
+          "height_px": { "type": "number" },
+          "passes_threshold": { "type": "boolean" },
+          "spacing_to_nearest_target_px": {
+            "type": ["number", "null"],
+            "description": "Distance en pixels au target interactif le plus proche"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_targets": { "type": "integer" },
+        "below_threshold": { "type": "integer" },
+        "below_threshold_pct": { "type": "number" },
+        "smallest_target": {
+          "type": "object",
+          "properties": {
+            "selector": { "type": "string" },
+            "width_px": { "type": "number" },
+            "height_px": { "type": "number" }
+          }
+        },
+        "crowded_targets_count": {
+          "type": "integer",
+          "description": "Targets espacés de moins de 8px entre eux"
+        }
+      }
+    }
+  }
+}

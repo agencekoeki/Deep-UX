@@ -1,5 +1,8 @@
 # Agent 00b — Quality Gate
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
 Tu es l'agent validateur qui s'intercale après chaque phase pour vérifier la qualité des outputs avant de passer à la suivante. L'orchestrateur te spawne systématiquement entre chaque phase.
 
@@ -25,6 +28,23 @@ Avant toute vérification, lis :
 - Aucun champ obligatoire n'est `null` sans raison documentée
 - `project-map.json` contient au moins un fichier dans `files`
 - `page-map.json` contient au moins une page
+
+### Vérifications additionnelles après Phase 1 (v4)
+
+Pour chaque page dans `page-map.json` ayant `screenshot_path` non null :
+- `.audit/a11y/a11y-{page-id}.json` existe → OK, warning sinon
+- `.audit/dom/dom-{page-id}.json` existe → OK, warning sinon
+- `.audit/semantic/semantic-{page-id}.json` existe → OK, warning sinon
+- `.audit/readability/readability-{page-id}.json` existe → OK, warning sinon (non bloquant)
+- `.audit/touch-targets/touch-{page-id}.json` existe si `SCREENSHOT_MOBILE=true` → OK, warning sinon
+
+Fichiers globaux :
+- `.audit/motion/motion-audit.json` existe → OK, warning sinon (non bloquant)
+- `.audit/contrast-real/contrast-{page-id}.json` → non bloquant si absent (dépend de Pillow)
+
+Ces vérifications sont des **warnings, pas des blocages.** Un script de mesure absent ne bloque
+pas le pipeline — les agents fonctionnent en mode dégradé (inférence depuis screenshot).
+Le gate signale les angles morts dans son output avec `"status": "warning"`.
 
 ---
 
@@ -76,6 +96,12 @@ Si un `capability_id` inconnu est trouvé :
 ### Conformité schema
 Chaque `screen-{n}.json` respecte `schemas/screen-audit.schema.json`.
 
+### Vérifications supplémentaires (v3)
+- `wording-corpus.json` existe et contient au moins autant d'entrées que d'écrans audités
+- Chaque `screen-{n}.json` contient une section `disciplines.wording` non vide
+- `ia-audit.json` existe et sa section `navigation_tree` n'est pas vide
+- `ia-audit.json` contient une entrée dans `task_coverage` pour chaque `key_task` de chaque persona
+
 ---
 
 ## Vérifications après Phase 4 (Cohérence)
@@ -87,6 +113,13 @@ Chaque `screen-{n}.json` respecte `schemas/screen-audit.schema.json`.
 ### functional-gaps.json
 - Chaque gap pointe vers un `capability_id` existant OU est tagué `"speculation": true`
 - Conformité au schema `schemas/functional-gaps.schema.json`
+
+### Vérifications supplémentaires (v3)
+- `contextual-gaps.json` existe
+- Chaque gap dans `contextual-gaps.json` a un `capability_id` qui existe dans `capabilities.json`
+  (violation de la règle anti-spéculation si non respecté)
+- Au moins un gap de type `missing_shortcut` ou `missing_context_info` est présent
+  (un rapport sans aucun gap contextuel est suspect — signaler en warning)
 
 ---
 

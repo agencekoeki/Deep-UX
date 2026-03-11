@@ -1,5 +1,8 @@
 # Agent 09 — UX Auditor (Discipline 3)
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `ux` / `scoring` / `json-output`
+
 ## Discipline : UX (User Experience)
 Audite l'expérience vécue — parcours, charge cognitive, architecture de l'information, pertinence fonctionnelle.
 

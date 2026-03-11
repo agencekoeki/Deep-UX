@@ -2650,25 +2650,25 @@ Note : Ces corrections sont souvent à effort très faible (xs ou s) pour un imp
 CC coche chaque item après création ou modification :
 
 ### Nouveaux fichiers de vocabulaire
-- [ ] `docs/vocabulaire-wording.md`
+- [x] `docs/vocabulaire-wording.md`
 
 ### Nouveaux schémas
-- [ ] `schemas/ia-audit.schema.json`
-- [ ] `schemas/contextual-gaps.schema.json`
+- [x] `schemas/ia-audit.schema.json`
+- [x] `schemas/contextual-gaps.schema.json`
 
 ### Nouveaux agents
-- [ ] `agents/18-wording-auditor.md`
-- [ ] `agents/19-ia-auditor.md`
-- [ ] `agents/20-contextual-gaps-auditor.md`
+- [x] `agents/18-wording-auditor.md`
+- [x] `agents/19-ia-auditor.md`
+- [x] `agents/20-contextual-gaps-auditor.md`
 
 ### Agents mis à jour
-- [ ] `agents/12-screen-dispatcher.md` (spawn agent 18 + score wording dans global)
-- [ ] `agents/00-orchestrator.md` (spawn agent 20 en Phase 4 + nouveaux fichiers d'état)
-- [ ] `agents/15-report-generator.md` (sections wording, IA, gaps contextuels)
-- [ ] `agents/00b-quality-gate.md` (vérifications v3)
+- [x] `agents/12-screen-dispatcher.md` (spawn agent 18 + score wording dans global)
+- [x] `agents/00-orchestrator.md` (spawn agent 20 en Phase 4 + nouveaux fichiers d'état)
+- [x] `agents/15-report-generator.md` (sections wording, IA, gaps contextuels)
+- [x] `agents/00b-quality-gate.md` (vérifications v3)
 
 ### Plugin manifest
-- [ ] `.claude-plugin/plugin.json` (v0.3.0, 22 agents)
+- [x] `.claude-plugin/plugin.json` (v0.3.0, 22 agents)
 
 
 # SPEC-v4.md — deep-ux — Additions v4
@@ -4045,40 +4045,40 @@ fi
 CC coche chaque item après création ou modification :
 
 ### Bootstrap et dépendances
-- [ ] `scripts/00-bootstrap.sh` (nouveaux dossiers de mesure)
-- [ ] `scripts/01-check-deps.sh` (Pillow, pyphen)
+- [x] `scripts/00-bootstrap.sh` (nouveaux dossiers de mesure)
+- [x] `scripts/01-check-deps.sh` (Pillow, pyphen)
 
 ### Nouveaux schémas
-- [ ] `schemas/a11y-raw.schema.json`
-- [ ] `schemas/dom-inventory.schema.json`
-- [ ] `schemas/semantic-structure.schema.json`
-- [ ] `schemas/readability.schema.json`
-- [ ] `schemas/touch-targets.schema.json`
-- [ ] `schemas/keyboard-nav.schema.json`
-- [ ] `schemas/contrast-real.schema.json`
-- [ ] `schemas/motion-audit.schema.json`
+- [x] `schemas/a11y-raw.schema.json`
+- [x] `schemas/dom-inventory.schema.json`
+- [x] `schemas/semantic-structure.schema.json`
+- [x] `schemas/readability.schema.json`
+- [x] `schemas/touch-targets.schema.json`
+- [x] `schemas/keyboard-nav.schema.json`
+- [x] `schemas/contrast-real.schema.json`
+- [x] `schemas/motion-audit.schema.json`
 
 ### Nouveaux scripts
-- [ ] `scripts/07-a11y-scan.py`
-- [ ] `scripts/08-dom-inventory.py`
-- [ ] `scripts/09-semantic-structure.py`
-- [ ] `scripts/10-readability.py`
-- [ ] `scripts/11-touch-targets.py`
-- [ ] `scripts/12-nav-keyboard.py`
-- [ ] `scripts/13-contrast-real.py`
-- [ ] `scripts/14-motion-audit.py`
+- [x] `scripts/07-a11y-scan.py`
+- [x] `scripts/08-dom-inventory.py`
+- [x] `scripts/09-semantic-structure.py`
+- [x] `scripts/10-readability.py`
+- [x] `scripts/11-touch-targets.py`
+- [x] `scripts/12-nav-keyboard.py`
+- [x] `scripts/13-contrast-real.py`
+- [x] `scripts/14-motion-audit.py`
 
 ### Agents mis à jour
-- [ ] `agents/11-ihm-auditor.md` (données mesurées + scoring WCAG)
-- [ ] `agents/10-webdesign-auditor.md` (touch targets + motion)
-- [ ] `agents/18-wording-auditor.md` (readability scores)
-- [ ] `agents/07-graphisme-auditor.md` (contrast-real)
-- [ ] `agents/00b-quality-gate.md` (vérifications v4 Phase 1)
-- [ ] `agents/15-report-generator.md` (tableau couverture mesure)
-- [ ] `agents/00-orchestrator.md` (Phase 1 avec scripts de mesure)
+- [x] `agents/11-ihm-auditor.md` (données mesurées + scoring WCAG)
+- [x] `agents/10-webdesign-auditor.md` (touch targets + motion)
+- [x] `agents/18-wording-auditor.md` (readability scores)
+- [x] `agents/07-graphisme-auditor.md` (contrast-real)
+- [x] `agents/00b-quality-gate.md` (vérifications v4 Phase 1)
+- [x] `agents/15-report-generator.md` (tableau couverture mesure)
+- [x] `agents/00-orchestrator.md` (Phase 1 avec scripts de mesure)
 
 ### Plugin manifest
-- [ ] `.claude-plugin/plugin.json` (v0.4.0 avec scripts listés)
+- [x] `.claude-plugin/plugin.json` (v0.4.0 avec scripts listés)
 
 
 
@@ -4965,43 +4965,43 @@ En cas de contradiction : la skill prévaut (plus récente et plus précise).
 CC coche chaque item après création ou modification :
 
 ### Skills mises à jour
-- [ ] `skills/ux-audit/SKILL.md` (restructuration + table disciplines + skills spécialisées)
+- [x] `skills/ux-audit/SKILL.md` (restructuration + table disciplines + skills spécialisées)
 
 ### Nouvelles skills
-- [ ] `skills/anti-drift/SKILL.md`
-- [ ] `skills/scoring/SKILL.md`
-- [ ] `skills/json-output/SKILL.md`
-- [ ] `skills/graphisme/SKILL.md`
-- [ ] `skills/ui/SKILL.md`
-- [ ] `skills/ux/SKILL.md`
-- [ ] `skills/webdesign/SKILL.md`
-- [ ] `skills/ihm/SKILL.md`
-- [ ] `skills/wording/SKILL.md`
+- [x] `skills/anti-drift/SKILL.md`
+- [x] `skills/scoring/SKILL.md`
+- [x] `skills/json-output/SKILL.md`
+- [x] `skills/graphisme/SKILL.md`
+- [x] `skills/ui/SKILL.md`
+- [x] `skills/ux/SKILL.md`
+- [x] `skills/webdesign/SKILL.md`
+- [x] `skills/ihm/SKILL.md`
+- [x] `skills/wording/SKILL.md`
 
 ### Agents mis à jour (déclaration skills en en-tête)
-- [ ] `agents/00-orchestrator.md`
-- [ ] `agents/00b-quality-gate.md`
-- [ ] `agents/01-interview-conductor.md`
-- [ ] `agents/02-capability-mapper.md`
-- [ ] `agents/03-token-extractor-agent.md`
-- [ ] `agents/04-persona-builder.md`
-- [ ] `agents/05-brand-auditor.md`
-- [ ] `agents/06-benchmark-researcher.md`
-- [ ] `agents/07-graphisme-auditor.md`
-- [ ] `agents/08-ui-auditor.md`
-- [ ] `agents/09-ux-auditor.md`
-- [ ] `agents/10-webdesign-auditor.md`
-- [ ] `agents/11-ihm-auditor.md`
-- [ ] `agents/12-screen-dispatcher.md`
-- [ ] `agents/13-consistency-checker.md`
-- [ ] `agents/14-functional-gap-analyst.md`
-- [ ] `agents/15-report-generator.md`
-- [ ] `agents/16-coverage-auditor.md`
-- [ ] `agents/17-contradiction-detector.md`
-- [ ] `agents/18-wording-auditor.md`
-- [ ] `agents/19-ia-auditor.md`
-- [ ] `agents/20-contextual-gaps-auditor.md`
+- [x] `agents/00-orchestrator.md`
+- [x] `agents/00b-quality-gate.md`
+- [x] `agents/01-interview-conductor.md`
+- [x] `agents/02-capability-mapper.md`
+- [x] `agents/03-token-extractor-agent.md`
+- [x] `agents/04-persona-builder.md`
+- [x] `agents/05-brand-auditor.md`
+- [x] `agents/06-benchmark-researcher.md`
+- [x] `agents/07-graphisme-auditor.md`
+- [x] `agents/08-ui-auditor.md`
+- [x] `agents/09-ux-auditor.md`
+- [x] `agents/10-webdesign-auditor.md`
+- [x] `agents/11-ihm-auditor.md`
+- [x] `agents/12-screen-dispatcher.md`
+- [x] `agents/13-consistency-checker.md`
+- [x] `agents/14-functional-gap-analyst.md`
+- [x] `agents/15-report-generator.md`
+- [x] `agents/16-coverage-auditor.md`
+- [x] `agents/17-contradiction-detector.md`
+- [x] `agents/18-wording-auditor.md`
+- [x] `agents/19-ia-auditor.md`
+- [x] `agents/20-contextual-gaps-auditor.md`
 
 ### Fichiers de configuration
-- [ ] `.claude-plugin/plugin.json` (v0.5.0, 10 skills listées)
-- [ ] `CLAUDE.md` (section architecture des skills)
+- [x] `.claude-plugin/plugin.json` (v0.5.0, 10 skills listées)
+- [x] `CLAUDE.md` (section architecture des skills)

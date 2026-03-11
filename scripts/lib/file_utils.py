@@ -14,10 +14,12 @@ def read_json(path):
 
 
 def write_json(path, data):
-    """Écrit un JSON formaté avec indentation."""
+    """Écrit un JSON formaté avec indentation (écriture atomique via .tmp + rename)."""
     ensure_dir(os.path.dirname(path))
-    with open(path, "w", encoding="utf-8") as f:
+    tmp_path = path + ".tmp"
+    with open(tmp_path, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
+    os.replace(tmp_path, path)
 
 
 def ensure_dir(path):

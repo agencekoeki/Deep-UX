@@ -14,7 +14,7 @@ echo "━━━━━━━━━━━━━━━━━━━━━━━━�
 echo ""
 
 # 1. Créer le dossier .audit/ et ses sous-dossiers
-SUBDIRS=("screenshots" "screen-audits" "phase2" "phase4" "reports" "quality-gates" "archives")
+SUBDIRS=("screenshots" "screen-audits" "phase2" "phase4" "reports" "quality-gates" "archives" "a11y" "dom" "semantic" "readability" "touch-targets" "keyboard-nav" "contrast-real" "motion")
 created=0
 
 if [ ! -d "$AUDIT_DIR" ]; then

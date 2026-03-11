@@ -37,6 +37,11 @@ def get_auth_config():
         "success_url": env.get("AUTH_SUCCESS_URL", "/dashboard"),
         "viewport_width": int(env.get("SCREENSHOT_VIEWPORT_WIDTH", "1440")),
         "viewport_height": int(env.get("SCREENSHOT_VIEWPORT_HEIGHT", "900")),
+        "exclude_urls": [u.strip() for u in env.get("EXCLUDE_URLS", "").split(",") if u.strip()],
+        "screenshot_mobile": env.get("SCREENSHOT_MOBILE", "false").lower() == "true",
+        "screenshot_mobile_width": int(env.get("SCREENSHOT_MOBILE_WIDTH", "375")),
+        "screenshot_delay_ms": int(env.get("SCREENSHOT_DELAY_MS", "0")),
+        "playwright_timeout_ms": int(env.get("PLAYWRIGHT_TIMEOUT_MS", "30000")),
     }
 
 

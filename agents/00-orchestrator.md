@@ -1,5 +1,8 @@
 # Agent 00 — Orchestrateur deep-ux
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
 Tu es l'orchestrateur principal du pipeline deep-ux. Tu coordonnes l'exécution séquentielle des phases et le lancement des agents.
 
@@ -46,13 +49,39 @@ deep-ux — État du pipeline
 
 **Phase 3 — Audit écrans :**
 - Vérifier `.audit/screen-audits/` — doit contenir un `screen-{page-id}.json` pour chaque page de `page-map.json`
-- COMPLETE si tous les écrans sont audités
+- Vérifier `.audit/wording-corpus.json` (produit par agent 18, mis à jour après chaque écran)
+- Vérifier `.audit/screen-audits/ia-audit.json` (produit par agent 19)
+- COMPLETE si tous les écrans sont audités ET ia-audit.json existe
 
 **Phase 4 — Cohérence :**
-- COMPLETE si `.audit/phase4/consistency.json` ET `.audit/phase4/functional-gaps.json` existent
+- COMPLETE si `.audit/phase4/consistency.json` ET `.audit/phase4/functional-gaps.json` ET `.audit/phase4/contextual-gaps.json` existent
 
 **Phase 5 — Rapports :**
 - COMPLETE si `.audit/reports/report-human.md` ET `.audit/reports/report-cc-tasks.json` ET `.audit/reports/report-client.html` existent
+
+## Phase 1 — Discovery (ordre d'exécution)
+
+1. `python3 scripts/02-discover.py`
+2. `python3 scripts/03-build-page-map.py`
+3. `python3 scripts/04-screenshot.py`
+4. **Scripts de mesure (parallélisables entre eux, après le screenshot) :**
+   - `python3 scripts/07-a11y-scan.py`
+   - `python3 scripts/08-dom-inventory.py`
+   - `python3 scripts/09-semantic-structure.py`
+   - `python3 scripts/10-readability.py`
+   - `python3 scripts/11-touch-targets.py`
+   - `python3 scripts/12-nav-keyboard.py`
+   - `python3 scripts/13-contrast-real.py`
+   - `python3 scripts/14-motion-audit.py`
+5. `python3 scripts/05-extract-tokens.py`
+6. `python3 scripts/00b-estimate-run.py` (si DRY_RUN=true)
+
+**Règle de parallélisation des scripts de mesure :**
+Ces scripts peuvent être lancés en parallèle (ils n'ont pas de dépendances entre eux)
+mais chacun ouvre son propre contexte Playwright. Sur un projet avec beaucoup de pages,
+limiter à 3 scripts en parallèle simultané pour éviter la surcharge mémoire.
+
+---
 
 ## Règles d'exécution
 
@@ -71,6 +100,14 @@ deep-ux — État du pipeline
 - Si un agent échoue → log l'erreur, marque l'écran/la phase comme échouée
 - Si une dépendance manque → STOP avec message clair
 
+### Phase 4 — Agents à spawner en parallèle
+- 13-consistency-checker
+- 14-functional-gap-analyst
+- 17-contradiction-detector
+- 20-contextual-gaps-auditor
+
+Attendre tous les outputs avant de passer en Phase 5.
+
 ### Communication
 - Affiche la progression après chaque étape importante
 - Met à jour l'état du pipeline à chaque transition de phase
@@ -88,6 +125,9 @@ deep-ux — État du pipeline
 - `.audit/screen-audits/screen-*.json`
 - `.audit/phase4/consistency.json`
 - `.audit/phase4/functional-gaps.json`
+- `.audit/phase4/contextual-gaps.json`
+- `.audit/wording-corpus.json`
+- `.audit/screen-audits/ia-audit.json`
 - `.audit/reports/report-human.md`
 
 ## Fichiers produits

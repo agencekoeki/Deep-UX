@@ -1,0 +1,54 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Real Contrast Ratios",
+  "description": "Ratios de contraste mesurés sur les pixels réels du screenshot — pas depuis le CSS",
+  "type": "object",
+  "required": ["page_id", "url", "measured_at", "measurements"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "measured_at": { "type": "string", "format": "date-time" },
+    "method": {
+      "type": "string",
+      "description": "pixel_sampling — sample les pixels du texte et du fond depuis le screenshot"
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["selector", "text_sample", "fg_color_sampled", "bg_color_sampled", "contrast_ratio", "wcag_aa", "wcag_aaa"],
+        "properties": {
+          "selector": { "type": "string" },
+          "text_sample": { "type": "string", "description": "Premiers 30 chars du texte" },
+          "font_size_px": { "type": "number" },
+          "font_bold": { "type": "boolean" },
+          "fg_color_sampled": { "type": "string", "description": "Couleur mesurée sur pixels — ex: rgb(51,51,51)" },
+          "bg_color_sampled": { "type": "string" },
+          "contrast_ratio": { "type": "number" },
+          "wcag_aa": {
+            "type": "boolean",
+            "description": "4.5:1 pour texte normal, 3:1 pour grand texte (>=18px ou >=14px bold)"
+          },
+          "wcag_aaa": {
+            "type": "boolean",
+            "description": "7:1 pour texte normal, 4.5:1 pour grand texte"
+          },
+          "note": {
+            "type": ["string", "null"],
+            "description": "Ex: 'fond dégradé — valeur approximative' ou 'fond image — non mesurable'"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_measured": { "type": "integer" },
+        "failing_wcag_aa": { "type": "integer" },
+        "failing_wcag_aa_pct": { "type": "number" },
+        "worst_ratio": { "type": "number" },
+        "worst_selector": { "type": "string" }
+      }
+    }
+  }
+}

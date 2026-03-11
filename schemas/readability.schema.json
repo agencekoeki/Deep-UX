@@ -1,0 +1,64 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Readability Analysis",
+  "type": "object",
+  "required": ["page_id", "url", "analyzed_at", "blocks"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "language_detected": { "type": "string" },
+    "blocks": {
+      "type": "array",
+      "description": "Blocs de texte substantiels analysés (>50 mots). Hors navigation, labels courts.",
+      "items": {
+        "type": "object",
+        "required": ["id", "selector", "word_count", "avg_sentence_length", "avg_word_length"],
+        "properties": {
+          "id": { "type": "string" },
+          "selector": { "type": "string" },
+          "text_sample": { "type": "string", "description": "Premiers 100 chars du bloc" },
+          "word_count": { "type": "integer" },
+          "sentence_count": { "type": "integer" },
+          "avg_sentence_length": { "type": "number", "description": "Mots par phrase en moyenne" },
+          "avg_word_length": { "type": "number", "description": "Caractères par mot en moyenne" },
+          "long_sentences_count": {
+            "type": "integer",
+            "description": "Phrases de plus de 25 mots — seuil de complexité"
+          },
+          "flesch_kincaid_fr": {
+            "type": "number",
+            "description": "Score adapté au français. >60 = accessible, 30-60 = difficile, <30 = très difficile"
+          },
+          "reading_level": {
+            "type": "string",
+            "enum": ["accessible", "moderate", "difficult", "very_difficult"]
+          }
+        }
+      }
+    },
+    "ctas_and_labels": {
+      "type": "array",
+      "description": "Labels courts extraits : boutons, titres, labels de navigation",
+      "items": {
+        "type": "object",
+        "properties": {
+          "selector": { "type": "string" },
+          "text": { "type": "string" },
+          "type": { "type": "string", "enum": ["button", "link", "heading", "label", "placeholder", "other"] }
+        }
+      }
+    },
+    "global_summary": {
+      "type": "object",
+      "properties": {
+        "total_words": { "type": "integer" },
+        "blocks_analyzed": { "type": "integer" },
+        "avg_flesch_fr": { "type": "number" },
+        "dominant_reading_level": { "type": "string" },
+        "ctas_count": { "type": "integer" },
+        "ctas_starting_with_verb": { "type": "integer" }
+      }
+    }
+  }
+}

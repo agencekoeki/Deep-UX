@@ -1,5 +1,8 @@
 # Agent 04 — Persona Builder
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
 Tu construis des personas riches à partir de l'interview ET de la recherche web. Tu produis 1 à 3 personas — jamais plus de 3.
 

@@ -16,7 +16,7 @@ Point deep-ux at any web project. It runs on its own. At the end, you get:
 
 - **Automatic screenshots** of every page, including behind authentication
 - **Personas built** from your code AND an interview with the product designer
-- **Screen-by-screen audit**: Nielsen heuristics, WCAG, visual consistency, relevance for the target user
+- **Screen-by-screen audit across 6 disciplines**: Graphisme (visual composition), UI (component system), UX (user flows), Web Design (responsive & performance), IHM (ergonomic laws & WCAG), Wording (microcopy & terminology)
 - **Cross-screen consistency report**: terminology mismatches, contradictory interaction patterns, broken navigation flows
 - **Grounded functional recommendations**: deep-ux never recommends a feature that doesn't exist in your code
 - **Work tickets** ready to use in a Claude Code implementation session
@@ -41,6 +41,8 @@ Point deep-ux at any web project. It runs on its own. At the end, you get:
 | Personas | No | Built from code + designer interview |
 | Cross-screen consistency | No | Dedicated Phase 4 agent |
 | Functional recommendations | Invented | Anchored to capabilities.json |
+| Automated measurement | No | 8 scripts: axe-core a11y, DOM inventory, touch targets, contrast ratios, keyboard nav, readability, semantic structure, motion audit |
+| Structured knowledge | Implicit | 10 skills: anti-drift rules, scoring anchors, JSON conventions, 6 discipline vocabularies |
 | Run time | A few minutes | Can run for hours unattended |
 
 ---
@@ -70,6 +72,10 @@ PHASE 1 — Discovery (automatic)
   Full file inventory, functional capability mapping from the code,
   design token extraction (colors, typography, spacing),
   Playwright screenshots of all pages.
+  Then 8 automated measurement scripts run on each page:
+  accessibility (axe-core), DOM inventory, semantic structure,
+  readability (Flesch-Kincaid FR), touch targets, keyboard navigation,
+  pixel-sampled contrast ratios, and animation/motion audit.
 
 PHASE 2 — Grounding (automatic)
   Persona construction from interview + sector analysis.
@@ -79,9 +85,10 @@ PHASE 3 — Screen-by-screen audit (automatic, parallel)
   Each screen is analyzed independently by a dedicated agent.
   Input: screenshot + source code + personas + capabilities.
 
-PHASE 4 — Cross-screen consistency (automatic)
-  One agent re-reads all screen audits and looks for contradictions,
-  terminology inconsistencies, pattern breaks.
+PHASE 4 — Cross-screen consistency (automatic, parallel)
+  4 agents run in parallel: consistency checker, functional gap analyst,
+  contradiction detector, and contextual gaps auditor. They consume all
+  screen audits + transversal outputs (wording-corpus, IA audit).
 
 PHASE 5 — Reports (automatic)
   Three formats: human-readable report, CC work tickets, client HTML report.
@@ -112,10 +119,22 @@ Everything lands in `.audit/` (auto-gitignored):
 │   ├── report-cc-tasks.json     ← Tickets ready for CC implementation
 │   └── report-client.html       ← Presentable client version
 ├── screen-audits/               ← JSON per screen
+├── phase2/                      ← Personas, brand, benchmarks
 ├── phase4/
 │   ├── consistency.json         ← Cross-screen consistency
-│   └── functional-gaps.json     ← Functional gaps
-└── screenshots/                 ← Full-page captures
+│   ├── functional-gaps.json     ← Functional gaps
+│   └── contextual-gaps.json     ← Misplaced features
+├── quality-gates/               ← Validation between phases
+├── screenshots/                 ← Full-page captures
+├── a11y/                        ← axe-core WCAG violations
+├── dom/                         ← Interactive element inventories
+├── semantic/                    ← HTML semantic structure
+├── readability/                 ← Flesch-Kincaid readability scores
+├── touch-targets/               ← Mobile tap target sizes
+├── keyboard-nav/                ← Tab order & focus traps
+├── contrast-real/               ← Pixel-sampled contrast ratios
+├── motion/                      ← Animation & transition audit
+└── archives/                    ← Previous audit runs
 ```
 
 ---
@@ -125,6 +144,8 @@ Everything lands in `.audit/` (auto-gitignored):
 - Claude Code with Bash access
 - Python 3.8+
 - Playwright (`pip install playwright && playwright install chromium`)
+- Pillow (`pip install Pillow`) — optional, non-blocking: enables pixel-sampled contrast measurement. Without it, `13-contrast-real.py` is skipped
+- pyphen (`pip install pyphen`) — optional, non-blocking: enables accurate French syllable counting. Without it, `10-readability.py` uses a heuristic fallback
 - Target project accessible locally or via URL
 
 ---
@@ -172,7 +193,7 @@ Vous pointez deep-ux sur n'importe quel projet web. Il tourne tout seul. À la f
 
 - **Des screenshots automatiques** de toutes vos pages, y compris derrière authentification
 - **Des personas construits** à partir de votre code ET d'une interview du concepteur
-- **Un audit écran par écran** : heuristiques Nielsen, WCAG, cohérence visuelle, pertinence pour la cible
+- **Un audit écran par écran sur 6 disciplines** : Graphisme (composition visuelle), UI (système de composants), UX (parcours utilisateur), Web Design (responsive et performance), IHM (lois ergonomiques et WCAG), Wording (microcopy et terminologie)
 - **Un rapport de cohérence inter-écrans** : incohérences de terminologie, patterns contradictoires, ruptures de navigation
 - **Des recommandations fonctionnelles ancrées** : deep-ux ne recommande jamais une fonctionnalité qui n'existe pas dans votre code
 - **Des tickets de travail** directement exploitables dans une session Claude Code
@@ -197,6 +218,8 @@ Vous pointez deep-ux sur n'importe quel projet web. Il tourne tout seul. À la f
 | Personas | Non | Construits à partir du code + interview |
 | Cohérence inter-écrans | Non | Agent dédié Phase 4 |
 | Recommandations fonctionnelles | Inventées | Ancrées sur capabilities.json |
+| Mesure automatisée | Non | 8 scripts : a11y axe-core, inventaire DOM, cibles tactiles, ratios contraste, navigation clavier, lisibilité, structure sémantique, audit motion |
+| Connaissance structurée | Implicite | 10 skills : règles anti-drift, étalons de score, conventions JSON, 6 vocabulaires disciplinaires |
 | Durée | Quelques minutes | Peut tourner des heures sans supervision |
 
 ---
@@ -226,6 +249,10 @@ PHASE 1 — Discovery (automatique)
   Inventaire de tous les fichiers, cartographie des capacités fonctionnelles
   dans le code, extraction des design tokens (couleurs, typo, espacements),
   screenshots Playwright de toutes les pages.
+  Puis 8 scripts de mesure automatisée sur chaque page :
+  accessibilité (axe-core), inventaire DOM, structure sémantique,
+  lisibilité (Flesch-Kincaid FR), cibles tactiles, navigation clavier,
+  ratios de contraste pixel, et audit animations/transitions.
 
 PHASE 2 — Grounding (automatique)
   Construction des personas à partir de l'interview + analyse du secteur.
@@ -235,9 +262,10 @@ PHASE 3 — Audit par écran (automatique, parallèle)
   Chaque écran est analysé indépendamment par un agent dédié.
   Input : screenshot + code source + personas + capabilities.
 
-PHASE 4 — Cohérence inter-écrans (automatique)
-  Un agent relit tous les audits d'écrans et cherche les contradictions,
-  incohérences de terminologie, ruptures de patterns.
+PHASE 4 — Cohérence inter-écrans (automatique, parallèle)
+  4 agents tournent en parallèle : cohérence, écarts fonctionnels,
+  détection de contradictions, et gaps contextuels. Ils consomment tous
+  les audits d'écrans + les outputs transversaux (wording-corpus, audit IA).
 
 PHASE 5 — Rapports (automatique)
   Trois formats : rapport humain lisible, tickets CC, rapport client HTML.
@@ -268,10 +296,22 @@ Tout est dans `.audit/` (gitignored automatiquement) :
 │   ├── report-cc-tasks.json     ← Tickets exploitables dans CC
 │   └── report-client.html       ← Version présentable au client
 ├── screen-audits/               ← JSON par écran
+├── phase2/                      ← Personas, marque, benchmarks
 ├── phase4/
 │   ├── consistency.json         ← Cohérence inter-écrans
-│   └── functional-gaps.json     ← Écarts fonctionnels
-└── screenshots/                 ← Captures pleine page
+│   ├── functional-gaps.json     ← Écarts fonctionnels
+│   └── contextual-gaps.json     ← Fonctionnalités mal positionnées
+├── quality-gates/               ← Validation entre phases
+├── screenshots/                 ← Captures pleine page
+├── a11y/                        ← Violations WCAG axe-core
+├── dom/                         ← Inventaire éléments interactifs
+├── semantic/                    ← Structure sémantique HTML
+├── readability/                 ← Scores lisibilité Flesch-Kincaid
+├── touch-targets/               ← Taille cibles tactiles mobile
+├── keyboard-nav/                ← Ordre de tab et pièges focus
+├── contrast-real/               ← Ratios contraste pixel
+├── motion/                      ← Audit animations et transitions
+└── archives/                    ← Runs d'audit précédents
 ```
 
 ---
@@ -281,6 +321,8 @@ Tout est dans `.audit/` (gitignored automatiquement) :
 - Claude Code avec accès Bash
 - Python 3.8+
 - Playwright (`pip install playwright && playwright install chromium`)
+- Pillow (`pip install Pillow`) — optionnel, non bloquant : active la mesure de contraste pixel. Sans lui, `13-contrast-real.py` est ignoré
+- pyphen (`pip install pyphen`) — optionnel, non bloquant : active la syllabification française exacte. Sans lui, `10-readability.py` utilise une estimation heuristique
 - Le projet cible doit être accessible localement ou via URL
 
 ---
