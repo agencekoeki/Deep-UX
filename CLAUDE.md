@@ -10,8 +10,9 @@ Tu es l'orchestrateur du plugin **deep-ux** — un système d'audit UX exhaustif
 Phase 0 — Bootstrap        → .audit/ structure
 Phase 1 — Interview        → .audit/interview.json
 Phase 2 — Discovery        → project-map, page-map, tokens, screenshots, capabilities, personas, brand, benchmarks
-Phase 3 — Audit écrans     → .audit/screen-audits/screen-{id}.json (5 disciplines × N écrans)
-Phase 4 — Cohérence        → consistency.json, functional-gaps.json
+                              + 8 scripts de mesure : a11y, dom, semantic, readability, touch-targets, keyboard-nav, contrast-real, motion
+Phase 3 — Audit écrans     → .audit/screen-audits/screen-{id}.json (6 disciplines × N écrans)
+Phase 4 — Cohérence        → consistency.json, functional-gaps.json, contradictions.json, contextual-gaps.json
 Phase 5 — Rapports         → report-human.md, report-cc-tasks.json, report-client.html
 ```
 
@@ -47,6 +48,11 @@ Non bloquant — l'audit continue même si la couverture est partielle.
 ### 17-contradiction-detector
 Spawné en Phase 4, en parallèle de 13-consistency-checker et 14-functional-gap-analyst.
 Son output est intégré dans le rapport final.
+
+### 20-contextual-gaps-auditor
+Spawné en Phase 4, en parallèle des autres agents Phase 4.
+Détecte les fonctionnalités existantes mais inaccessibles là où l'utilisateur en a besoin.
+Son output `.audit/phase4/contextual-gaps.json` est intégré dans le rapport final.
 
 ## Mode diff
 La commande `/deep-ux:diff` est disponible après un premier run complet.

@@ -16,7 +16,7 @@ Point deep-ux at any web project. It runs on its own. At the end, you get:
 
 - **Automatic screenshots** of every page, including behind authentication
 - **Personas built** from your code AND an interview with the product designer
-- **Screen-by-screen audit**: Nielsen heuristics, WCAG, visual consistency, relevance for the target user
+- **Screen-by-screen audit across 6 disciplines**: Graphisme (visual composition), UI (component system), UX (user flows), Web Design (responsive & performance), IHM (ergonomic laws & WCAG), Wording (microcopy & terminology)
 - **Cross-screen consistency report**: terminology mismatches, contradictory interaction patterns, broken navigation flows
 - **Grounded functional recommendations**: deep-ux never recommends a feature that doesn't exist in your code
 - **Work tickets** ready to use in a Claude Code implementation session
@@ -70,6 +70,10 @@ PHASE 1 — Discovery (automatic)
   Full file inventory, functional capability mapping from the code,
   design token extraction (colors, typography, spacing),
   Playwright screenshots of all pages.
+  Then 8 automated measurement scripts run on each page:
+  accessibility (axe-core), DOM inventory, semantic structure,
+  readability (Flesch-Kincaid FR), touch targets, keyboard navigation,
+  pixel-sampled contrast ratios, and animation/motion audit.
 
 PHASE 2 — Grounding (automatic)
   Persona construction from interview + sector analysis.
@@ -112,10 +116,22 @@ Everything lands in `.audit/` (auto-gitignored):
 │   ├── report-cc-tasks.json     ← Tickets ready for CC implementation
 │   └── report-client.html       ← Presentable client version
 ├── screen-audits/               ← JSON per screen
+├── phase2/                      ← Personas, brand, benchmarks
 ├── phase4/
 │   ├── consistency.json         ← Cross-screen consistency
-│   └── functional-gaps.json     ← Functional gaps
-└── screenshots/                 ← Full-page captures
+│   ├── functional-gaps.json     ← Functional gaps
+│   └── contextual-gaps.json     ← Misplaced features
+├── quality-gates/               ← Validation between phases
+├── screenshots/                 ← Full-page captures
+├── a11y/                        ← axe-core WCAG violations
+├── dom/                         ← Interactive element inventories
+├── semantic/                    ← HTML semantic structure
+├── readability/                 ← Flesch-Kincaid readability scores
+├── touch-targets/               ← Mobile tap target sizes
+├── keyboard-nav/                ← Tab order & focus traps
+├── contrast-real/               ← Pixel-sampled contrast ratios
+├── motion/                      ← Animation & transition audit
+└── archives/                    ← Previous audit runs
 ```
 
 ---
@@ -172,7 +188,7 @@ Vous pointez deep-ux sur n'importe quel projet web. Il tourne tout seul. À la f
 
 - **Des screenshots automatiques** de toutes vos pages, y compris derrière authentification
 - **Des personas construits** à partir de votre code ET d'une interview du concepteur
-- **Un audit écran par écran** : heuristiques Nielsen, WCAG, cohérence visuelle, pertinence pour la cible
+- **Un audit écran par écran sur 6 disciplines** : Graphisme (composition visuelle), UI (système de composants), UX (parcours utilisateur), Web Design (responsive et performance), IHM (lois ergonomiques et WCAG), Wording (microcopy et terminologie)
 - **Un rapport de cohérence inter-écrans** : incohérences de terminologie, patterns contradictoires, ruptures de navigation
 - **Des recommandations fonctionnelles ancrées** : deep-ux ne recommande jamais une fonctionnalité qui n'existe pas dans votre code
 - **Des tickets de travail** directement exploitables dans une session Claude Code
@@ -226,6 +242,10 @@ PHASE 1 — Discovery (automatique)
   Inventaire de tous les fichiers, cartographie des capacités fonctionnelles
   dans le code, extraction des design tokens (couleurs, typo, espacements),
   screenshots Playwright de toutes les pages.
+  Puis 8 scripts de mesure automatisée sur chaque page :
+  accessibilité (axe-core), inventaire DOM, structure sémantique,
+  lisibilité (Flesch-Kincaid FR), cibles tactiles, navigation clavier,
+  ratios de contraste pixel, et audit animations/transitions.
 
 PHASE 2 — Grounding (automatique)
   Construction des personas à partir de l'interview + analyse du secteur.
@@ -268,10 +288,22 @@ Tout est dans `.audit/` (gitignored automatiquement) :
 │   ├── report-cc-tasks.json     ← Tickets exploitables dans CC
 │   └── report-client.html       ← Version présentable au client
 ├── screen-audits/               ← JSON par écran
+├── phase2/                      ← Personas, marque, benchmarks
 ├── phase4/
 │   ├── consistency.json         ← Cohérence inter-écrans
-│   └── functional-gaps.json     ← Écarts fonctionnels
-└── screenshots/                 ← Captures pleine page
+│   ├── functional-gaps.json     ← Écarts fonctionnels
+│   └── contextual-gaps.json     ← Fonctionnalités mal positionnées
+├── quality-gates/               ← Validation entre phases
+├── screenshots/                 ← Captures pleine page
+├── a11y/                        ← Violations WCAG axe-core
+├── dom/                         ← Inventaire éléments interactifs
+├── semantic/                    ← Structure sémantique HTML
+├── readability/                 ← Scores lisibilité Flesch-Kincaid
+├── touch-targets/               ← Taille cibles tactiles mobile
+├── keyboard-nav/                ← Ordre de tab et pièges focus
+├── contrast-real/               ← Ratios contraste pixel
+├── motion/                      ← Audit animations et transitions
+└── archives/                    ← Runs d'audit précédents
 ```
 
 ---
