@@ -4045,37 +4045,37 @@ fi
 CC coche chaque item après création ou modification :
 
 ### Bootstrap et dépendances
-- [ ] `scripts/00-bootstrap.sh` (nouveaux dossiers de mesure)
-- [ ] `scripts/01-check-deps.sh` (Pillow, pyphen)
+- [x] `scripts/00-bootstrap.sh` (nouveaux dossiers de mesure)
+- [x] `scripts/01-check-deps.sh` (Pillow, pyphen)
 
 ### Nouveaux schémas
-- [ ] `schemas/a11y-raw.schema.json`
-- [ ] `schemas/dom-inventory.schema.json`
-- [ ] `schemas/semantic-structure.schema.json`
-- [ ] `schemas/readability.schema.json`
-- [ ] `schemas/touch-targets.schema.json`
-- [ ] `schemas/keyboard-nav.schema.json`
-- [ ] `schemas/contrast-real.schema.json`
-- [ ] `schemas/motion-audit.schema.json`
+- [x] `schemas/a11y-raw.schema.json`
+- [x] `schemas/dom-inventory.schema.json`
+- [x] `schemas/semantic-structure.schema.json`
+- [x] `schemas/readability.schema.json`
+- [x] `schemas/touch-targets.schema.json`
+- [x] `schemas/keyboard-nav.schema.json`
+- [x] `schemas/contrast-real.schema.json`
+- [x] `schemas/motion-audit.schema.json`
 
 ### Nouveaux scripts
-- [ ] `scripts/07-a11y-scan.py`
-- [ ] `scripts/08-dom-inventory.py`
-- [ ] `scripts/09-semantic-structure.py`
-- [ ] `scripts/10-readability.py`
-- [ ] `scripts/11-touch-targets.py`
-- [ ] `scripts/12-nav-keyboard.py`
-- [ ] `scripts/13-contrast-real.py`
-- [ ] `scripts/14-motion-audit.py`
+- [x] `scripts/07-a11y-scan.py`
+- [x] `scripts/08-dom-inventory.py`
+- [x] `scripts/09-semantic-structure.py`
+- [x] `scripts/10-readability.py`
+- [x] `scripts/11-touch-targets.py`
+- [x] `scripts/12-nav-keyboard.py`
+- [x] `scripts/13-contrast-real.py`
+- [x] `scripts/14-motion-audit.py`
 
 ### Agents mis à jour
-- [ ] `agents/11-ihm-auditor.md` (données mesurées + scoring WCAG)
-- [ ] `agents/10-webdesign-auditor.md` (touch targets + motion)
-- [ ] `agents/18-wording-auditor.md` (readability scores)
-- [ ] `agents/07-graphisme-auditor.md` (contrast-real)
-- [ ] `agents/00b-quality-gate.md` (vérifications v4 Phase 1)
-- [ ] `agents/15-report-generator.md` (tableau couverture mesure)
-- [ ] `agents/00-orchestrator.md` (Phase 1 avec scripts de mesure)
+- [x] `agents/11-ihm-auditor.md` (données mesurées + scoring WCAG)
+- [x] `agents/10-webdesign-auditor.md` (touch targets + motion)
+- [x] `agents/18-wording-auditor.md` (readability scores)
+- [x] `agents/07-graphisme-auditor.md` (contrast-real)
+- [x] `agents/00b-quality-gate.md` (vérifications v4 Phase 1)
+- [x] `agents/15-report-generator.md` (tableau couverture mesure)
+- [x] `agents/00-orchestrator.md` (Phase 1 avec scripts de mesure)
 
 ### Plugin manifest
-- [ ] `.claude-plugin/plugin.json` (v0.4.0 avec scripts listés)
+- [x] `.claude-plugin/plugin.json` (v0.4.0 avec scripts listés)

@@ -56,6 +56,30 @@ deep-ux — État du pipeline
 **Phase 5 — Rapports :**
 - COMPLETE si `.audit/reports/report-human.md` ET `.audit/reports/report-cc-tasks.json` ET `.audit/reports/report-client.html` existent
 
+## Phase 1 — Discovery (ordre d'exécution)
+
+1. `python3 scripts/02-discover.py`
+2. `python3 scripts/03-build-page-map.py`
+3. `python3 scripts/04-screenshot.py`
+4. **Scripts de mesure (parallélisables entre eux, après le screenshot) :**
+   - `python3 scripts/07-a11y-scan.py`
+   - `python3 scripts/08-dom-inventory.py`
+   - `python3 scripts/09-semantic-structure.py`
+   - `python3 scripts/10-readability.py`
+   - `python3 scripts/11-touch-targets.py`
+   - `python3 scripts/12-nav-keyboard.py`
+   - `python3 scripts/13-contrast-real.py`
+   - `python3 scripts/14-motion-audit.py`
+5. `python3 scripts/05-extract-tokens.py`
+6. `python3 scripts/00b-estimate-run.py` (si DRY_RUN=true)
+
+**Règle de parallélisation des scripts de mesure :**
+Ces scripts peuvent être lancés en parallèle (ils n'ont pas de dépendances entre eux)
+mais chacun ouvre son propre contexte Playwright. Sur un projet avec beaucoup de pages,
+limiter à 3 scripts en parallèle simultané pour éviter la surcharge mémoire.
+
+---
+
 ## Règles d'exécution
 
 ### Séquentiel strict entre phases

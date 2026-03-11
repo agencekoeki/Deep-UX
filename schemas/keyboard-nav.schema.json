@@ -1,0 +1,104 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Keyboard Navigation Audit",
+  "type": "object",
+  "required": ["page_id", "url", "audited_at", "tab_sequence", "issues"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "audited_at": { "type": "string", "format": "date-time" },
+    "tab_sequence": {
+      "type": "array",
+      "description": "Séquence des éléments dans l'ordre de tabulation réel",
+      "items": {
+        "type": "object",
+        "required": ["order", "selector", "tag", "visible_text", "has_focus_indicator"],
+        "properties": {
+          "order": { "type": "integer" },
+          "selector": { "type": "string" },
+          "tag": { "type": "string" },
+          "visible_text": { "type": "string" },
+          "has_focus_indicator": {
+            "type": "boolean",
+            "description": "true si un outline ou autre indicateur visuel est visible au focus"
+          },
+          "focus_indicator_style": {
+            "type": ["string", "null"],
+            "description": "CSS de l'outline au moment du focus, null si absent"
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "object",
+      "properties": {
+        "focus_traps": {
+          "type": "array",
+          "description": "Zones où la navigation clavier est bloquée sans possibilité d'en sortir",
+          "items": {
+            "type": "object",
+            "properties": {
+              "selector": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "missing_focus_indicators": {
+          "type": "array",
+          "description": "Éléments qui reçoivent le focus mais sans indicateur visuel",
+          "items": {
+            "type": "object",
+            "properties": {
+              "selector": { "type": "string" },
+              "tag": { "type": "string" },
+              "visible_text": { "type": "string" }
+            }
+          }
+        },
+        "illogical_tab_order": {
+          "type": "array",
+          "description": "Sauts dans la séquence de tabulation qui ne suivent pas l'ordre visuel",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_selector": { "type": "string" },
+              "to_selector": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "positive_tabindex_count": {
+          "type": "integer",
+          "description": "Éléments avec tabindex > 0 — anti-pattern qui force un ordre artificiel"
+        },
+        "interactive_unreachable": {
+          "type": "array",
+          "description": "Éléments interactifs non atteignables au clavier",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_focusable": { "type": "integer" },
+        "without_focus_indicator": { "type": "integer" },
+        "without_focus_indicator_pct": { "type": "number" },
+        "focus_traps_count": { "type": "integer" },
+        "keyboard_score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Score calculé par le script — 100 = navigation clavier parfaite"
+        }
+      }
+    }
+  }
+}

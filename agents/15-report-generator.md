@@ -38,6 +38,22 @@ Tous les fichiers `.audit/` :
 ## Résumé exécutif
 [5 lignes max — l'essentiel pour un décideur pressé]
 
+## Couverture de mesure automatisée
+
+| Script | Données | Disponible | Pages couvertes |
+|---|---|---|---|
+| 07-a11y-scan | Violations WCAG axe-core | ✓/✗ | N/total |
+| 08-dom-inventory | Inventaire éléments interactifs | ✓/✗ | N/total |
+| 09-semantic-structure | Structure HTML sémantique | ✓/✗ | N/total |
+| 10-readability | Scores lisibilité | ✓/✗ | N/total |
+| 11-touch-targets | Taille cibles tactiles | ✓/✗ | N/total |
+| 12-nav-keyboard | Navigation clavier | ✓/✗ | N/total |
+| 13-contrast-real | Ratios contraste réels | ✓/✗ | N/total |
+| 14-motion-audit | Animations/transitions | ✓/✗ | Global |
+
+Note : Les agents opèrent en mode "inférence depuis screenshot" pour les données manquantes.
+Les observations basées sur des mesures sont marquées [mesuré], les inférences sont marquées [inféré].
+
 ## 10 actions à mener en priorité
 Ces 10 actions représentent le meilleur ratio impact/effort identifié dans cet audit.
 Elles seules pourraient améliorer significativement l'expérience utilisateur.

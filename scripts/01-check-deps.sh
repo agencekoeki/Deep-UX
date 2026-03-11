@@ -81,6 +81,31 @@ for lib_entry in "${python_libs[@]}"; do
     fi
 done
 
+# Dépendances v4 — scripts de mesure
+echo ""
+echo "  — Dépendances v4 (scripts de mesure) —"
+
+# axe-core — injecté via CDN, pas de dépendance locale
+echo "  ✓ axe-core — injecté via CDN (pas d'installation locale requise)"
+
+# Pillow (pour contrast-real.py)
+if python3 -c "import PIL" 2>/dev/null; then
+    echo "  ✓ Pillow"
+else
+    echo "  ⚠ Pillow manquant (requis pour 13-contrast-real.py)"
+    echo "    → Installer : pip install Pillow --break-system-packages"
+    echo "    Note : non bloquant — contrast-real.py sera skippé si absent"
+fi
+
+# pyphen (pour 10-readability.py)
+if python3 -c "import pyphen" 2>/dev/null; then
+    echo "  ✓ pyphen"
+else
+    echo "  ⚠ pyphen manquant (requis pour 10-readability.py)"
+    echo "    → Installer : pip install pyphen --break-system-packages"
+    echo "    Note : non bloquant — readability.py utilisera une estimation syllabique simplifiée"
+fi
+
 echo ""
 echo "━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━"
 if [ "$errors" -gt 0 ]; then

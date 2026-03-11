@@ -26,6 +26,23 @@ Avant toute vérification, lis :
 - `project-map.json` contient au moins un fichier dans `files`
 - `page-map.json` contient au moins une page
 
+### Vérifications additionnelles après Phase 1 (v4)
+
+Pour chaque page dans `page-map.json` ayant `screenshot_path` non null :
+- `.audit/a11y/a11y-{page-id}.json` existe → OK, warning sinon
+- `.audit/dom/dom-{page-id}.json` existe → OK, warning sinon
+- `.audit/semantic/semantic-{page-id}.json` existe → OK, warning sinon
+- `.audit/readability/readability-{page-id}.json` existe → OK, warning sinon (non bloquant)
+- `.audit/touch-targets/touch-{page-id}.json` existe si `SCREENSHOT_MOBILE=true` → OK, warning sinon
+
+Fichiers globaux :
+- `.audit/motion/motion-audit.json` existe → OK, warning sinon (non bloquant)
+- `.audit/contrast-real/contrast-{page-id}.json` → non bloquant si absent (dépend de Pillow)
+
+Ces vérifications sont des **warnings, pas des blocages.** Un script de mesure absent ne bloque
+pas le pipeline — les agents fonctionnent en mode dégradé (inférence depuis screenshot).
+Le gate signale les angles morts dans son output avec `"status": "warning"`.
+
 ---
 
 ## Vérifications après Phase 2 (Grounding)

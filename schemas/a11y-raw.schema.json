@@ -1,0 +1,74 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "A11y Raw Scan",
+  "description": "Violations WCAG détectées automatiquement par axe-core sur une page",
+  "type": "object",
+  "required": ["page_id", "url", "scanned_at", "violations", "passes_count", "incomplete"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "scanned_at": { "type": "string", "format": "date-time" },
+    "engine": { "type": "string", "description": "axe-core version utilisée" },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "impact", "description", "wcag_criteria", "nodes"],
+        "properties": {
+          "id": { "type": "string", "description": "Identifiant axe-core de la règle" },
+          "impact": { "type": "string", "enum": ["critical", "serious", "moderate", "minor"] },
+          "description": { "type": "string" },
+          "help_url": { "type": "string" },
+          "wcag_criteria": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Ex: ['wcag2a', 'wcag143', 'cat.color']"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["html", "selector", "failure_summary"],
+              "properties": {
+                "html": { "type": "string", "description": "HTML de l'élément fautif (tronqué à 200 chars)" },
+                "selector": { "type": "string", "description": "Sélecteur CSS de l'élément" },
+                "failure_summary": { "type": "string" },
+                "position": {
+                  "type": "object",
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" },
+                    "width": { "type": "number" },
+                    "height": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passes_count": { "type": "integer", "description": "Nombre de règles passées (non listé en détail)" },
+    "incomplete": {
+      "type": "array",
+      "description": "Règles nécessitant vérification manuelle",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "nodes_count": { "type": "integer" }
+        }
+      }
+    },
+    "violations_by_impact": {
+      "type": "object",
+      "properties": {
+        "critical": { "type": "integer" },
+        "serious": { "type": "integer" },
+        "moderate": { "type": "integer" },
+        "minor": { "type": "integer" }
+      }
+    }
+  }
+}

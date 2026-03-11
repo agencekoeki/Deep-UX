@@ -14,6 +14,18 @@
 
 ---
 
+## Données de mesure disponibles
+
+- `.audit/readability/readability-{page-id}.json` → scores de lisibilité et CTA inventoriés
+
+**Si `readability-{page-id}.json` existe :**
+- Utiliser `global_summary.dominant_reading_level` comme donnée objective au lieu d'estimer
+- Utiliser `global_summary.ctas_starting_with_verb` pour le critère "qualité des CTAs"
+- Citer les blocs spécifiques avec leur score Flesch : `[readability-{page-id}.json: bloc .description score=28 — très difficile]`
+- Utiliser `ctas_and_labels` comme corpus de base (complété par l'analyse visuelle du screenshot)
+
+---
+
 ## Référentiels à lire au démarrage
 
 1. `docs/vocabulaire-wording.md` — vocabulaire obligatoire

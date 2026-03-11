@@ -14,6 +14,29 @@ Lis `docs/vocabulaire-ihm.md` avant de commencer. Utilise EXCLUSIVEMENT ce vocab
 ## Output
 Section `ihm` dans le fichier `screen-{n}.json` de l'écran courant, incluant les `nielsen_scores`.
 
+## Données de mesure disponibles
+
+Avant d'analyser le screenshot, l'agent lit les fichiers de mesure suivants si disponibles :
+
+- `.audit/a11y/a11y-{page-id}.json` → violations WCAG réelles, par sélecteur
+- `.audit/semantic/semantic-{page-id}.json` → structure headings, landmarks, images sans alt
+- `.audit/keyboard-nav/keyboard-{page-id}.json` → focus indicators, traps, ordre de tab
+- `.audit/contrast-real/contrast-{page-id}.json` → ratios de contraste réels par élément
+
+**Règle :** si ces fichiers existent, les observations IHM doivent les citer.
+Format : `[a11y-{page-id}.json: violations.critical=3, dont color-contrast×2]`
+
+**Règle anti-réinvention :** l'agent ne recalcule pas ce que les scripts ont déjà mesuré.
+Il interprète, contextualise par rapport aux personas, et priorise.
+
+Les sous-scores Nielsen sont calculés en croisant :
+- Les violations axe-core → heuristiques 5 (prévention erreurs) et 6 (reconnaissance vs rappel)
+- La structure sémantique → heuristique 4 (cohérence et standards)
+- La navigation clavier → heuristique 3 (contrôle et liberté)
+- Les ratios de contraste → heuristique 8 (design esthétique et minimaliste) + WCAG
+
+---
+
 ## Règle de description préalable
 **AVANT toute évaluation**, décris les éléments d'interaction :
 ```
@@ -58,10 +81,19 @@ Chaque heuristique : score 0-100, avec observation spécifique.
 - **Feedback** : chaque action déclenche-t-elle un retour perceptible ?
 - **Modèle conceptuel** : l'interface correspond-elle au modèle mental attendu ?
 
-### 6. Accessibilité WCAG 2.1 (10 points)
-- **Niveau A** : erreurs bloquantes (images sans alt, formulaires sans label, etc.)
-- **Niveau AA** : objectif standard (contraste 4.5:1, navigation clavier, etc.)
-- **Niveau AAA** : bonnes pratiques (si applicable)
+### 6. Accessibilité (WCAG 2.1) — données mesurées (10 points)
+
+Si `a11y-{page-id}.json` existe :
+- Lister les violations critical et serious par critère WCAG (ex: "1.4.3 Contrast: 2 violations")
+- Lister les éléments du schéma `semantic-{page-id}.json` non conformes (images sans alt, formulaires sans label)
+- Scorer par niveau :
+  - Niveau A violations bloquantes → score plancher à max 40/100 pour la sous-section WCAG
+  - Niveau AA violations → -5 points par violation serious
+  - Niveau AA violations → -2 points par violation moderate
+
+Si `a11y-{page-id}.json` n'existe pas :
+- Analyser depuis le screenshot et le code source
+- Taguer chaque observation `[inférence — non mesuré]`
 
 ## Vocabulaire obligatoire
 affordance, signifiant, contrainte, feedback, modèle conceptuel, heuristique, charge cognitive, mémoire de travail, chunk, loi de Fitts, loi de Hick, WCAG, ARIA, focus management, skip link.

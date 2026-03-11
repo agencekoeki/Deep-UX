@@ -1,0 +1,106 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Semantic Structure",
+  "type": "object",
+  "required": ["page_id", "url", "analyzed_at", "headings", "landmarks", "aria_roles", "skip_links"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "headings": {
+      "type": "array",
+      "description": "Hiérarchie des titres dans l'ordre d'apparition dans le DOM",
+      "items": {
+        "type": "object",
+        "required": ["level", "text", "selector"],
+        "properties": {
+          "level": { "type": "integer", "minimum": 1, "maximum": 6 },
+          "text": { "type": "string" },
+          "selector": { "type": "string" },
+          "position_y": { "type": "number" }
+        }
+      }
+    },
+    "heading_hierarchy_valid": {
+      "type": "boolean",
+      "description": "true si aucun saut de niveau (H1→H3 sans H2 = false)"
+    },
+    "heading_hierarchy_issues": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Description des sauts de niveau détectés"
+    },
+    "landmarks": {
+      "type": "object",
+      "description": "Présence des éléments de structuration HTML5",
+      "properties": {
+        "header": { "type": "boolean" },
+        "nav": { "type": "boolean" },
+        "main": { "type": "boolean" },
+        "aside": { "type": "boolean" },
+        "footer": { "type": "boolean" },
+        "article": { "type": "boolean" },
+        "section": { "type": "boolean" },
+        "multiple_nav": { "type": "boolean", "description": "true si plusieurs <nav> présents" },
+        "nav_aria_labels": { "type": "boolean", "description": "true si chaque <nav> a un aria-label ou aria-labelledby" }
+      }
+    },
+    "aria_roles": {
+      "type": "array",
+      "description": "Rôles ARIA explicitement déclarés (hors rôles implicites des balises HTML5)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string" },
+          "selector": { "type": "string" },
+          "has_accessible_name": { "type": "boolean" }
+        }
+      }
+    },
+    "skip_links": {
+      "type": "array",
+      "description": "Liens d'évitement détectés",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "target": { "type": "string" },
+          "visible_on_focus": { "type": "boolean" }
+        }
+      }
+    },
+    "lang_attribute": {
+      "type": "object",
+      "properties": {
+        "present": { "type": "boolean" },
+        "value": { "type": ["string", "null"] }
+      }
+    },
+    "images": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer" },
+        "with_alt": { "type": "integer" },
+        "with_empty_alt": { "type": "integer", "description": "Images décoratives avec alt=''" },
+        "without_alt": { "type": "integer" },
+        "missing_alt_selectors": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "forms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "selector": { "type": "string" },
+          "fields_count": { "type": "integer" },
+          "fields_with_label": { "type": "integer" },
+          "fields_without_label": { "type": "integer" },
+          "unlabeled_selectors": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
