@@ -1,0 +1,50 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Personas",
+  "description": "Personas construites à partir de l'interview et de la recherche",
+  "type": "object",
+  "required": ["generated_at", "personas"],
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "personas": {
+      "type": "array",
+      "minItems": 1,
+      "maxItems": 3,
+      "items": {
+        "type": "object",
+        "required": ["id", "name", "role", "age_range", "tech_literacy", "context", "goals", "frustrations", "mental_model", "cognitive_load_tolerance", "key_tasks", "success_definition", "quote_representative"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^persona-[0-9]+$" },
+          "name": { "type": "string" },
+          "role": { "type": "string" },
+          "age_range": { "type": "string" },
+          "tech_literacy": { "type": "string", "enum": ["débutant", "intermédiaire", "expert"] },
+          "context": {
+            "type": "object",
+            "required": ["work_environment", "devices", "usage_frequency", "previous_tool"],
+            "properties": {
+              "work_environment": { "type": "string", "enum": ["bureau fixe", "terrain", "hybride", "mobile"] },
+              "devices": { "type": "array", "items": { "type": "string" } },
+              "usage_frequency": { "type": "string", "enum": ["quotidien", "hebdomadaire", "ponctuel"] },
+              "previous_tool": { "type": "string" }
+            }
+          },
+          "goals": { "type": "array", "items": { "type": "string" } },
+          "frustrations": { "type": "array", "items": { "type": "string" } },
+          "mental_model": { "type": "string" },
+          "cognitive_load_tolerance": { "type": "string", "enum": ["faible", "moyen", "élevé"] },
+          "key_tasks": { "type": "array", "items": { "type": "string" }, "maxItems": 3 },
+          "success_definition": { "type": "string" },
+          "quote_representative": { "type": "string" },
+          "sources": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string",
+              "enum": ["interview_q1", "interview_q2", "interview_q3", "interview_q4", "interview_q5", "interview_q6", "interview_q7", "interview_q8", "interview_q9", "interview_q10", "web_research", "inferred"]
+            }
+          }
+        }
+      }
+    }
+  }
+}

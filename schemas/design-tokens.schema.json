@@ -1,0 +1,88 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Design Tokens",
+  "description": "Tokens de design extraits du projet — couleurs, typographie, espacements, ombres, border-radius",
+  "type": "object",
+  "required": ["colors", "typography", "spacing", "borders", "shadows", "breakpoints", "contrast_ratios", "token_coherence_score"],
+  "properties": {
+    "colors": {
+      "type": "object",
+      "required": ["primary", "neutral", "semantic", "all_values", "css_variables", "has_design_system"],
+      "properties": {
+        "primary": { "type": "array", "items": { "type": "string" } },
+        "neutral": { "type": "array", "items": { "type": "string" } },
+        "semantic": {
+          "type": "object",
+          "properties": {
+            "success": { "type": "string" },
+            "error": { "type": "string" },
+            "warning": { "type": "string" }
+          }
+        },
+        "all_values": { "type": "array", "items": { "type": "string" } },
+        "css_variables": {
+          "type": "object",
+          "additionalProperties": { "type": "string" }
+        },
+        "has_design_system": { "type": "boolean" }
+      }
+    },
+    "typography": {
+      "type": "object",
+      "required": ["font_families", "sizes_used", "size_scale", "line_heights_used", "dominant_body_size", "dominant_heading_size"],
+      "properties": {
+        "font_families": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["name", "weights", "source"],
+            "properties": {
+              "name": { "type": "string" },
+              "weights": { "type": "array", "items": { "type": "integer" } },
+              "source": { "type": "string", "enum": ["google", "local", "system"] }
+            }
+          }
+        },
+        "sizes_used": { "type": "array", "items": { "type": "string" } },
+        "size_scale": { "type": "string", "enum": ["chaotic", "loose", "consistent"] },
+        "line_heights_used": { "type": "array", "items": { "type": "string" } },
+        "dominant_body_size": { "type": "string" },
+        "dominant_heading_size": { "type": "string" }
+      }
+    },
+    "spacing": {
+      "type": "object",
+      "required": ["values_used", "scale_type", "base_unit"],
+      "properties": {
+        "values_used": { "type": "array", "items": { "type": "string" } },
+        "scale_type": { "type": "string", "enum": ["4px-grid", "8px-grid", "chaotic", "mixed"] },
+        "base_unit": { "type": "string" }
+      }
+    },
+    "borders": {
+      "type": "object",
+      "required": ["radius_values", "border_styles"],
+      "properties": {
+        "radius_values": { "type": "array", "items": { "type": "string" } },
+        "border_styles": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "shadows": { "type": "array", "items": { "type": "string" } },
+    "breakpoints": { "type": "array", "items": { "type": "string" } },
+    "contrast_ratios": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["fg", "bg", "ratio", "wcag_aa", "wcag_aaa"],
+        "properties": {
+          "fg": { "type": "string" },
+          "bg": { "type": "string" },
+          "ratio": { "type": "number" },
+          "wcag_aa": { "type": "boolean" },
+          "wcag_aaa": { "type": "boolean" }
+        }
+      }
+    },
+    "token_coherence_score": { "type": "integer", "minimum": 0, "maximum": 100 }
+  }
+}

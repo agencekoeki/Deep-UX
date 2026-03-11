@@ -1,0 +1,69 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Interview",
+  "description": "Résultats de l'interview du concepteur par l'agent 01-interview-conductor",
+  "type": "object",
+  "required": ["status", "started_at", "questions"],
+  "properties": {
+    "status": {
+      "type": "string",
+      "enum": ["in_progress", "complete"]
+    },
+    "started_at": {
+      "type": "string",
+      "format": "date-time"
+    },
+    "completed_at": {
+      "type": ["string", "null"],
+      "format": "date-time"
+    },
+    "questions": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "question", "answered"],
+        "properties": {
+          "id": {
+            "type": "string",
+            "pattern": "^q[0-9]+$"
+          },
+          "question": {
+            "type": "string"
+          },
+          "category": {
+            "type": "string",
+            "enum": ["context", "users", "goals", "pain_points", "brand", "constraints", "priorities"]
+          },
+          "answer": {
+            "type": ["string", "null"]
+          },
+          "answered": {
+            "type": "boolean"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": ["object", "null"],
+      "properties": {
+        "project_name": { "type": "string" },
+        "project_type": { "type": "string" },
+        "sector": { "type": "string" },
+        "target_users": { "type": "string" },
+        "primary_goal": { "type": "string" },
+        "known_pain_points": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "brand_keywords": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "constraints": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,40 @@
+{
+  "name": "deep-ux",
+  "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, and IHM disciplines.",
+  "version": "0.2.0",
+  "author": {
+    "name": "Kōeki Agency",
+    "url": "https://koeki.fr"
+  },
+  "homepage": "https://github.com/koeki-agency/deep-ux",
+  "license": "MIT",
+  "agent": "00-orchestrator",
+  "agents": [
+    "00-orchestrator",
+    "00b-quality-gate",
+    "01-interview-conductor",
+    "02-capability-mapper",
+    "03-token-extractor-agent",
+    "04-persona-builder",
+    "05-brand-auditor",
+    "06-benchmark-researcher",
+    "07-graphisme-auditor",
+    "08-ui-auditor",
+    "09-ux-auditor",
+    "10-webdesign-auditor",
+    "11-ihm-auditor",
+    "12-screen-dispatcher",
+    "13-consistency-checker",
+    "14-functional-gap-analyst",
+    "15-report-generator",
+    "16-coverage-auditor",
+    "17-contradiction-detector"
+  ],
+  "commands": [
+    "run",
+    "diff"
+  ],
+  "skills": [
+    "ux-audit"
+  ]
+}

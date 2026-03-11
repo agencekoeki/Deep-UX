@@ -1,0 +1,57 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Brand Audit",
+  "description": "Audit de cohérence de l'identité de marque dans l'interface",
+  "type": "object",
+  "required": ["audited_at", "palette_analysis", "typography_personality", "logo_presence", "visual_tone", "cross_screen_consistency", "observations", "recommendations"],
+  "properties": {
+    "audited_at": { "type": "string", "format": "date-time" },
+    "palette_analysis": {
+      "type": "object",
+      "required": ["declared_colors", "actual_colors", "coherence_score", "observations"],
+      "properties": {
+        "declared_colors": { "type": "array", "items": { "type": "string" } },
+        "actual_colors": { "type": "array", "items": { "type": "string" } },
+        "coherence_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "observations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "typography_personality": {
+      "type": "object",
+      "required": ["personality_type", "formality", "observations"],
+      "properties": {
+        "personality_type": { "type": "string" },
+        "formality": { "type": "string", "enum": ["formelle", "technique", "chaleureuse", "neutre", "créative"] },
+        "observations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "logo_presence": {
+      "type": "object",
+      "required": ["detected", "consistent_placement"],
+      "properties": {
+        "detected": { "type": "boolean" },
+        "consistent_placement": { "type": "boolean" },
+        "observations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "visual_tone": {
+      "type": "object",
+      "required": ["tone", "temperature", "observations"],
+      "properties": {
+        "tone": { "type": "string", "enum": ["minimaliste", "dense", "corporate", "friendly", "sérieux"] },
+        "temperature": { "type": "string", "enum": ["chaud", "froid", "neutre"] },
+        "observations": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "cross_screen_consistency": {
+      "type": "object",
+      "required": ["score", "inconsistencies"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "inconsistencies": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "observations": { "type": "array", "items": { "type": "string" } },
+    "recommendations": { "type": "array", "items": { "type": "string" } }
+  }
+}
