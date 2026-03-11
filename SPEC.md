@@ -2669,3 +2669,1413 @@ CC coche chaque item après création ou modification :
 
 ### Plugin manifest
 - [x] `.claude-plugin/plugin.json` (v0.3.0, 22 agents)
+
+
+# SPEC-v4.md — deep-ux — Additions v4
+## Addendum à SPEC.md, SPEC-v2.md et SPEC-v3.md
+
+**Lis ce fichier en entier avant de créer quoi que ce soit.**
+**Ce fichier COMPLÈTE les specs précédentes. Il ne les remplace pas.**
+**Après chaque fichier créé ou modifié, coche la case correspondante dans ## Progression.**
+**Ne passe jamais à l'étape suivante sans avoir fini la précédente.**
+
+---
+
+## Contexte de cette v4 — Philosophie des scripts de mesure
+
+Les specs v1 à v3 ont construit la colonne vertébrale : agents, schemas, vocabulaires.
+Un angle mort persistait : les agents inféraient depuis des screenshots.
+Un screenshot te dit *à quoi ça ressemble*. Il ne te dit pas *ce qui est réellement dans le DOM*.
+
+Cette v4 corrige ça avec un principe simple :
+
+> **Les scripts mesurent. Les agents interprètent.**
+
+8 nouveaux scripts Python tournent en Phase 1, après `04-screenshot.py`.
+Chacun produit des JSON de mesures objectives.
+Les agents correspondants consomment ces mesures au lieu d'inférer depuis des images.
+
+Conséquence directe sur la règle anti-drift :
+- Avant : `"Les touch targets semblent petits sur mobile"`
+- Après : `"17 éléments interactifs sous 44×44px — dont .btn-primary à 28×24px (source: touch-targets-page-001.json:12)"`
+
+C'est la différence entre un avis et un fait.
+
+---
+
+## Ce que cette v4 ajoute
+
+1. `scripts/07-a11y-scan.py` — violations WCAG réelles via axe-core
+2. `scripts/08-dom-inventory.py` — inventaire complet des éléments interactifs avec positions
+3. `scripts/09-semantic-structure.py` — structure sémantique HTML réelle
+4. `scripts/10-readability.py` — scores de lisibilité des textes
+5. `scripts/11-touch-targets.py` — taille réelle des cibles tactiles en mobile
+6. `scripts/12-nav-keyboard.py` — ordre de focus, indicateurs, focus traps
+7. `scripts/13-contrast-real.py` — ratios de contraste réels (pixels, pas CSS)
+8. `scripts/14-motion-audit.py` — inventaire des animations et transitions
+9. Nouveaux schémas JSON pour chaque output
+10. Mise à jour des agents consommateurs
+11. Mise à jour de `00-bootstrap.sh` (nouveaux dossiers)
+12. Mise à jour de `00b-quality-gate.md` (nouvelles vérifications Phase 1)
+13. Mise à jour de `plugin.json` → v0.4.0
+14. Mise à jour de `CLAUDE.md` (nouveaux scripts Phase 1)
+
+---
+
+## Règle commune à tous les scripts v4
+
+Tous les scripts de mesure suivent ces règles sans exception :
+
+1. **Lecture seule sur le projet cible.** Jamais de modification.
+2. **Idempotents.** Un script peut être relancé sans écraser un output valide existant — il vérifie l'existence du fichier output avant de tourner.
+3. **Par page, pas global.** Chaque script produit un fichier par page (`{slug}-{page-id}.json`), sauf exceptions documentées.
+4. **Graceful failure.** Si une page échoue (timeout, erreur JS), le script log dans `script-errors.json` et continue avec la suivante.
+5. **Source explicite.** Chaque entrée du JSON produit contient un champ `source` qui pointe vers le sélecteur CSS, la ligne de fichier, ou les coordonnées pixel exactes de l'observation.
+6. **Unités cohérentes.** Toujours en pixels CSS (pas en rem, pas en pt). Les positions sont des coordonnées `{x, y, width, height}` relatives au viewport.
+
+---
+
+## ÉTAPE 1 — Mettre à jour scripts/00-bootstrap.sh
+
+**Action :** Ajouter la création des dossiers de mesure dans `.audit/` :
+
+```bash
+# Dossiers de mesure scripts v4
+mkdir -p .audit/a11y
+mkdir -p .audit/dom
+mkdir -p .audit/semantic
+mkdir -p .audit/readability
+mkdir -p .audit/touch-targets
+mkdir -p .audit/keyboard-nav
+mkdir -p .audit/contrast-real
+mkdir -p .audit/motion
+```
+
+Ajouter aussi l'entrée dans `.audit/.gitignore` pour ces dossiers :
+```
+a11y/
+dom/
+semantic/
+readability/
+touch-targets/
+keyboard-nav/
+contrast-real/
+motion/
+```
+
+---
+
+## ÉTAPE 2 — Créer schemas/a11y-raw.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "A11y Raw Scan",
+  "description": "Violations WCAG détectées automatiquement par axe-core sur une page",
+  "type": "object",
+  "required": ["page_id", "url", "scanned_at", "violations", "passes_count", "incomplete"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "scanned_at": { "type": "string", "format": "date-time" },
+    "engine": { "type": "string", "description": "axe-core version utilisée" },
+    "violations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "impact", "description", "wcag_criteria", "nodes"],
+        "properties": {
+          "id": { "type": "string", "description": "Identifiant axe-core de la règle" },
+          "impact": { "type": "string", "enum": ["critical", "serious", "moderate", "minor"] },
+          "description": { "type": "string" },
+          "help_url": { "type": "string" },
+          "wcag_criteria": {
+            "type": "array",
+            "items": { "type": "string" },
+            "description": "Ex: ['wcag2a', 'wcag143', 'cat.color']"
+          },
+          "nodes": {
+            "type": "array",
+            "items": {
+              "type": "object",
+              "required": ["html", "selector", "failure_summary"],
+              "properties": {
+                "html": { "type": "string", "description": "HTML de l'élément fautif (tronqué à 200 chars)" },
+                "selector": { "type": "string", "description": "Sélecteur CSS de l'élément" },
+                "failure_summary": { "type": "string" },
+                "position": {
+                  "type": "object",
+                  "properties": {
+                    "x": { "type": "number" },
+                    "y": { "type": "number" },
+                    "width": { "type": "number" },
+                    "height": { "type": "number" }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "passes_count": { "type": "integer", "description": "Nombre de règles passées (non listé en détail)" },
+    "incomplete": {
+      "type": "array",
+      "description": "Règles nécessitant vérification manuelle",
+      "items": {
+        "type": "object",
+        "properties": {
+          "id": { "type": "string" },
+          "description": { "type": "string" },
+          "nodes_count": { "type": "integer" }
+        }
+      }
+    },
+    "violations_by_impact": {
+      "type": "object",
+      "properties": {
+        "critical": { "type": "integer" },
+        "serious": { "type": "integer" },
+        "moderate": { "type": "integer" },
+        "minor": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 3 — Créer schemas/dom-inventory.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "DOM Inventory",
+  "description": "Inventaire de tous les éléments interactifs d'une page avec positions et tailles réelles",
+  "type": "object",
+  "required": ["page_id", "url", "inventoried_at", "viewport", "elements"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "inventoried_at": { "type": "string", "format": "date-time" },
+    "viewport": {
+      "type": "object",
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      }
+    },
+    "elements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "tag", "type", "selector", "position", "visible_text"],
+        "properties": {
+          "id": { "type": "string", "description": "Identifiant séquentiel elem-001, elem-002..." },
+          "tag": { "type": "string", "description": "button, a, input, select, textarea..." },
+          "type": {
+            "type": "string",
+            "enum": ["button", "link", "input_text", "input_checkbox", "input_radio",
+                     "input_select", "input_file", "textarea", "other_interactive"]
+          },
+          "selector": { "type": "string" },
+          "position": {
+            "type": "object",
+            "required": ["x", "y", "width", "height"],
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" },
+              "width": { "type": "number" },
+              "height": { "type": "number" }
+            }
+          },
+          "visible_text": { "type": "string", "description": "Texte visible de l'élément" },
+          "aria_label": { "type": ["string", "null"] },
+          "aria_role": { "type": ["string", "null"] },
+          "disabled": { "type": "boolean" },
+          "in_viewport": { "type": "boolean", "description": "Visible sans scroll au chargement" },
+          "tab_index": { "type": ["integer", "null"] }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_interactive": { "type": "integer" },
+        "buttons_count": { "type": "integer" },
+        "links_count": { "type": "integer" },
+        "inputs_count": { "type": "integer" },
+        "above_fold_count": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 4 — Créer schemas/semantic-structure.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Semantic Structure",
+  "type": "object",
+  "required": ["page_id", "url", "analyzed_at", "headings", "landmarks", "aria_roles", "skip_links"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "headings": {
+      "type": "array",
+      "description": "Hiérarchie des titres dans l'ordre d'apparition dans le DOM",
+      "items": {
+        "type": "object",
+        "required": ["level", "text", "selector"],
+        "properties": {
+          "level": { "type": "integer", "minimum": 1, "maximum": 6 },
+          "text": { "type": "string" },
+          "selector": { "type": "string" },
+          "position_y": { "type": "number" }
+        }
+      }
+    },
+    "heading_hierarchy_valid": {
+      "type": "boolean",
+      "description": "true si aucun saut de niveau (H1→H3 sans H2 = false)"
+    },
+    "heading_hierarchy_issues": {
+      "type": "array",
+      "items": { "type": "string" },
+      "description": "Description des sauts de niveau détectés"
+    },
+    "landmarks": {
+      "type": "object",
+      "description": "Présence des éléments de structuration HTML5",
+      "properties": {
+        "header": { "type": "boolean" },
+        "nav": { "type": "boolean" },
+        "main": { "type": "boolean" },
+        "aside": { "type": "boolean" },
+        "footer": { "type": "boolean" },
+        "article": { "type": "boolean" },
+        "section": { "type": "boolean" },
+        "multiple_nav": { "type": "boolean", "description": "true si plusieurs <nav> présents" },
+        "nav_aria_labels": { "type": "boolean", "description": "true si chaque <nav> a un aria-label ou aria-labelledby" }
+      }
+    },
+    "aria_roles": {
+      "type": "array",
+      "description": "Rôles ARIA explicitement déclarés (hors rôles implicites des balises HTML5)",
+      "items": {
+        "type": "object",
+        "properties": {
+          "role": { "type": "string" },
+          "selector": { "type": "string" },
+          "has_accessible_name": { "type": "boolean" }
+        }
+      }
+    },
+    "skip_links": {
+      "type": "array",
+      "description": "Liens d'évitement détectés",
+      "items": {
+        "type": "object",
+        "properties": {
+          "text": { "type": "string" },
+          "target": { "type": "string" },
+          "visible_on_focus": { "type": "boolean" }
+        }
+      }
+    },
+    "lang_attribute": {
+      "type": "object",
+      "properties": {
+        "present": { "type": "boolean" },
+        "value": { "type": ["string", "null"] }
+      }
+    },
+    "images": {
+      "type": "object",
+      "properties": {
+        "total": { "type": "integer" },
+        "with_alt": { "type": "integer" },
+        "with_empty_alt": { "type": "integer", "description": "Images décoratives avec alt=''" },
+        "without_alt": { "type": "integer" },
+        "missing_alt_selectors": {
+          "type": "array",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "forms": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "properties": {
+          "selector": { "type": "string" },
+          "fields_count": { "type": "integer" },
+          "fields_with_label": { "type": "integer" },
+          "fields_without_label": { "type": "integer" },
+          "unlabeled_selectors": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 5 — Créer schemas/readability.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Readability Analysis",
+  "type": "object",
+  "required": ["page_id", "url", "analyzed_at", "blocks"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "language_detected": { "type": "string" },
+    "blocks": {
+      "type": "array",
+      "description": "Blocs de texte substantiels analysés (>50 mots). Hors navigation, labels courts.",
+      "items": {
+        "type": "object",
+        "required": ["id", "selector", "word_count", "avg_sentence_length", "avg_word_length"],
+        "properties": {
+          "id": { "type": "string" },
+          "selector": { "type": "string" },
+          "text_sample": { "type": "string", "description": "Premiers 100 chars du bloc" },
+          "word_count": { "type": "integer" },
+          "sentence_count": { "type": "integer" },
+          "avg_sentence_length": { "type": "number", "description": "Mots par phrase en moyenne" },
+          "avg_word_length": { "type": "number", "description": "Caractères par mot en moyenne" },
+          "long_sentences_count": {
+            "type": "integer",
+            "description": "Phrases de plus de 25 mots — seuil de complexité"
+          },
+          "flesch_kincaid_fr": {
+            "type": "number",
+            "description": "Score adapté au français. >60 = accessible, 30-60 = difficile, <30 = très difficile"
+          },
+          "reading_level": {
+            "type": "string",
+            "enum": ["accessible", "moderate", "difficult", "very_difficult"]
+          }
+        }
+      }
+    },
+    "ctas_and_labels": {
+      "type": "array",
+      "description": "Labels courts extraits : boutons, titres, labels de navigation",
+      "items": {
+        "type": "object",
+        "properties": {
+          "selector": { "type": "string" },
+          "text": { "type": "string" },
+          "type": { "type": "string", "enum": ["button", "link", "heading", "label", "placeholder", "other"] }
+        }
+      }
+    },
+    "global_summary": {
+      "type": "object",
+      "properties": {
+        "total_words": { "type": "integer" },
+        "blocks_analyzed": { "type": "integer" },
+        "avg_flesch_fr": { "type": "number" },
+        "dominant_reading_level": { "type": "string" },
+        "ctas_count": { "type": "integer" },
+        "ctas_starting_with_verb": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 6 — Créer schemas/touch-targets.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Touch Targets Audit",
+  "description": "Taille des cibles interactives mesurée en mode mobile viewport",
+  "type": "object",
+  "required": ["page_id", "url", "measured_at", "viewport_mobile", "targets"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "measured_at": { "type": "string", "format": "date-time" },
+    "viewport_mobile": {
+      "type": "object",
+      "properties": {
+        "width": { "type": "integer" },
+        "height": { "type": "integer" }
+      }
+    },
+    "threshold_px": {
+      "type": "integer",
+      "default": 44,
+      "description": "Seuil en pixels CSS — 44px = standard iOS/Google Material"
+    },
+    "targets": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "selector", "tag", "visible_text", "width_px", "height_px", "passes_threshold"],
+        "properties": {
+          "id": { "type": "string" },
+          "selector": { "type": "string" },
+          "tag": { "type": "string" },
+          "visible_text": { "type": "string" },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          },
+          "width_px": { "type": "number" },
+          "height_px": { "type": "number" },
+          "passes_threshold": { "type": "boolean" },
+          "spacing_to_nearest_target_px": {
+            "type": ["number", "null"],
+            "description": "Distance en pixels au target interactif le plus proche — espacement insuffisant = risque de tap erroné"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_targets": { "type": "integer" },
+        "below_threshold": { "type": "integer" },
+        "below_threshold_pct": { "type": "number" },
+        "smallest_target": {
+          "type": "object",
+          "properties": {
+            "selector": { "type": "string" },
+            "width_px": { "type": "number" },
+            "height_px": { "type": "number" }
+          }
+        },
+        "crowded_targets_count": {
+          "type": "integer",
+          "description": "Targets espacés de moins de 8px entre eux"
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 7 — Créer schemas/keyboard-nav.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Keyboard Navigation Audit",
+  "type": "object",
+  "required": ["page_id", "url", "audited_at", "tab_sequence", "issues"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "audited_at": { "type": "string", "format": "date-time" },
+    "tab_sequence": {
+      "type": "array",
+      "description": "Séquence des éléments dans l'ordre de tabulation réel",
+      "items": {
+        "type": "object",
+        "required": ["order", "selector", "tag", "visible_text", "has_focus_indicator"],
+        "properties": {
+          "order": { "type": "integer" },
+          "selector": { "type": "string" },
+          "tag": { "type": "string" },
+          "visible_text": { "type": "string" },
+          "has_focus_indicator": {
+            "type": "boolean",
+            "description": "true si un outline ou autre indicateur visuel est visible au focus"
+          },
+          "focus_indicator_style": {
+            "type": ["string", "null"],
+            "description": "CSS de l'outline au moment du focus, null si absent"
+          },
+          "position": {
+            "type": "object",
+            "properties": {
+              "x": { "type": "number" },
+              "y": { "type": "number" }
+            }
+          }
+        }
+      }
+    },
+    "issues": {
+      "type": "object",
+      "properties": {
+        "focus_traps": {
+          "type": "array",
+          "description": "Zones où la navigation clavier est bloquée sans possibilité d'en sortir",
+          "items": {
+            "type": "object",
+            "properties": {
+              "selector": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "missing_focus_indicators": {
+          "type": "array",
+          "description": "Éléments qui reçoivent le focus mais sans indicateur visuel",
+          "items": {
+            "type": "object",
+            "properties": {
+              "selector": { "type": "string" },
+              "tag": { "type": "string" },
+              "visible_text": { "type": "string" }
+            }
+          }
+        },
+        "illogical_tab_order": {
+          "type": "array",
+          "description": "Sauts dans la séquence de tabulation qui ne suivent pas l'ordre visuel",
+          "items": {
+            "type": "object",
+            "properties": {
+              "from_selector": { "type": "string" },
+              "to_selector": { "type": "string" },
+              "description": { "type": "string" }
+            }
+          }
+        },
+        "positive_tabindex_count": {
+          "type": "integer",
+          "description": "Éléments avec tabindex > 0 — anti-pattern qui force un ordre artificiel"
+        },
+        "interactive_unreachable": {
+          "type": "array",
+          "description": "Éléments interactifs non atteignables au clavier",
+          "items": { "type": "string" }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_focusable": { "type": "integer" },
+        "without_focus_indicator": { "type": "integer" },
+        "without_focus_indicator_pct": { "type": "number" },
+        "focus_traps_count": { "type": "integer" },
+        "keyboard_score": {
+          "type": "integer",
+          "minimum": 0,
+          "maximum": 100,
+          "description": "Score calculé par le script — 100 = navigation clavier parfaite"
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 8 — Créer schemas/contrast-real.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Real Contrast Ratios",
+  "description": "Ratios de contraste mesurés sur les pixels réels du screenshot — pas depuis le CSS",
+  "type": "object",
+  "required": ["page_id", "url", "measured_at", "measurements"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "url": { "type": "string" },
+    "measured_at": { "type": "string", "format": "date-time" },
+    "method": {
+      "type": "string",
+      "description": "pixel_sampling — sample les pixels du texte et du fond depuis le screenshot"
+    },
+    "measurements": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["selector", "text_sample", "fg_color_sampled", "bg_color_sampled", "contrast_ratio", "wcag_aa", "wcag_aaa"],
+        "properties": {
+          "selector": { "type": "string" },
+          "text_sample": { "type": "string", "description": "Premiers 30 chars du texte" },
+          "font_size_px": { "type": "number" },
+          "font_bold": { "type": "boolean" },
+          "fg_color_sampled": { "type": "string", "description": "Couleur mesurée sur pixels — ex: rgb(51,51,51)" },
+          "bg_color_sampled": { "type": "string" },
+          "contrast_ratio": { "type": "number" },
+          "wcag_aa": {
+            "type": "boolean",
+            "description": "4.5:1 pour texte normal, 3:1 pour grand texte (>=18px ou >=14px bold)"
+          },
+          "wcag_aaa": {
+            "type": "boolean",
+            "description": "7:1 pour texte normal, 4.5:1 pour grand texte"
+          },
+          "note": {
+            "type": ["string", "null"],
+            "description": "Ex: 'fond dégradé — valeur approximative' ou 'fond image — non mesurable'"
+          }
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_measured": { "type": "integer" },
+        "failing_wcag_aa": { "type": "integer" },
+        "failing_wcag_aa_pct": { "type": "number" },
+        "worst_ratio": { "type": "number" },
+        "worst_selector": { "type": "string" }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 9 — Créer schemas/motion-audit.schema.json
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Motion & Animation Audit",
+  "type": "object",
+  "required": ["analyzed_at", "animations", "transitions", "prefers_reduced_motion"],
+  "properties": {
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "source_files": { "type": "array", "items": { "type": "string" } },
+    "animations": {
+      "type": "array",
+      "description": "Toutes les @keyframes déclarées",
+      "items": {
+        "type": "object",
+        "required": ["name", "file", "duration_ms", "used_by"],
+        "properties": {
+          "name": { "type": "string" },
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "duration_ms": { "type": "number" },
+          "iteration_count": { "type": "string", "description": "1, infinite, etc." },
+          "used_by": { "type": "array", "items": { "type": "string" }, "description": "Sélecteurs CSS qui utilisent cette animation" },
+          "flagged": {
+            "type": "boolean",
+            "description": "true si durée > 300ms ET animation non désactivée par prefers-reduced-motion"
+          }
+        }
+      }
+    },
+    "transitions": {
+      "type": "array",
+      "description": "Toutes les transitions CSS déclarées",
+      "items": {
+        "type": "object",
+        "required": ["selector", "file", "property", "duration_ms", "flagged"],
+        "properties": {
+          "selector": { "type": "string" },
+          "file": { "type": "string" },
+          "line": { "type": "integer" },
+          "property": { "type": "string" },
+          "duration_ms": { "type": "number" },
+          "easing": { "type": "string" },
+          "flagged": {
+            "type": "boolean",
+            "description": "true si durée > 300ms sur un élément interactif"
+          }
+        }
+      }
+    },
+    "prefers_reduced_motion": {
+      "type": "object",
+      "properties": {
+        "media_query_present": {
+          "type": "boolean",
+          "description": "true si @media (prefers-reduced-motion: reduce) est déclaré quelque part"
+        },
+        "files_with_query": { "type": "array", "items": { "type": "string" } },
+        "animations_covered": {
+          "type": "integer",
+          "description": "Nombre d'animations/transitions désactivées dans ce media query"
+        },
+        "animations_not_covered": {
+          "type": "integer",
+          "description": "Nombre d'animations/transitions NON couvertes par le media query"
+        }
+      }
+    },
+    "summary": {
+      "type": "object",
+      "properties": {
+        "total_animations": { "type": "integer" },
+        "total_transitions": { "type": "integer" },
+        "flagged_count": { "type": "integer" },
+        "has_reduced_motion_support": { "type": "boolean" },
+        "infinite_animations_count": { "type": "integer" }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 10 — Créer scripts/07-a11y-scan.py
+
+**Rôle :** Lance axe-core sur chaque page déjà chargée via Playwright et produit les violations WCAG réelles.
+
+**Inputs :** `.audit/page-map.json`, `.audit/.env`
+**Output :** `.audit/a11y/a11y-{page-id}.json` par page
+
+**Dépendances :**
+- `playwright` (déjà requis)
+- `axe-playwright` (`pip install axe-playwright --break-system-packages`) ou injection du script axe-core.js via `page.add_script_tag`
+
+**Ce qu'il fait :**
+1. Lit `page-map.json` pour la liste des pages
+2. Pour chaque page avec `screenshot_path` (déjà capturée) :
+   - Ouvre une nouvelle page Playwright avec le même contexte d'auth
+   - Navigue vers l'URL
+   - Attend `networkidle`
+   - Injecte axe-core via `page.add_script_tag(url="https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.9.1/axe.min.js")`
+   - Exécute `await page.evaluate("axe.run()")`
+   - Parse les `violations`, `passes.length`, `incomplete`
+   - Pour chaque violation, récupère la bounding box du premier node via `page.locator(selector).bounding_box()`
+   - Sauvegarde dans `.audit/a11y/a11y-{page-id}.json`
+3. Log les erreurs dans `.audit/script-errors.json` et continue
+
+**Structure du run :**
+```python
+import asyncio
+import json
+from playwright.async_api import async_playwright
+from lib.file_utils import read_json, write_json, ensure_dir
+from lib.progress import log_phase, log_step, log_success, log_error, log_skip
+from lib.auth import load_env, get_auth_config
+
+AXE_CDN = "https://cdnjs.cloudflare.com/ajax/libs/axe-core/4.9.1/axe.min.js"
+AUDIT_DIR = ".audit"
+OUTPUT_DIR = f"{AUDIT_DIR}/a11y"
+PAGE_MAP_PATH = f"{AUDIT_DIR}/page-map.json"
+ERRORS_PATH = f"{AUDIT_DIR}/script-errors.json"
+
+async def scan_page(context, page_info, errors):
+    page_id = page_info["id"]
+    url = page_info.get("url_or_path", "")
+    output_path = f"{OUTPUT_DIR}/a11y-{page_id}.json"
+
+    if read_json(output_path):
+        log_skip(f"a11y-{page_id}.json déjà existant — skip")
+        return
+
+    page = await context.new_page()
+    try:
+        env = load_env()
+        base_url = env.get("BASE_URL", "").rstrip("/")
+        full_url = base_url + url if url.startswith("/") else url
+
+        await page.goto(full_url, wait_until="networkidle",
+                        timeout=int(env.get("PLAYWRIGHT_TIMEOUT_MS", 30000)))
+        await page.add_script_tag(url=AXE_CDN)
+        await page.wait_for_timeout(500)
+
+        results = await page.evaluate("""
+            () => axe.run({
+                runOnly: { type: 'tag', values: ['wcag2a', 'wcag2aa', 'wcag21aa', 'best-practice'] }
+            })
+        """)
+
+        violations = []
+        for v in results.get("violations", []):
+            nodes = []
+            for node in v.get("nodes", []):
+                sel = node.get("target", [""])[0] if node.get("target") else ""
+                bbox = None
+                try:
+                    if sel:
+                        el = page.locator(sel).first
+                        bbox = await el.bounding_box()
+                except Exception:
+                    pass
+                nodes.append({
+                    "html": node.get("html", "")[:200],
+                    "selector": sel,
+                    "failure_summary": node.get("failureSummary", ""),
+                    "position": bbox
+                })
+            wcag_tags = [t for t in v.get("tags", []) if "wcag" in t or "cat." in t]
+            violations.append({
+                "id": v["id"],
+                "impact": v.get("impact", "unknown"),
+                "description": v.get("description", ""),
+                "help_url": v.get("helpUrl", ""),
+                "wcag_criteria": wcag_tags,
+                "nodes": nodes
+            })
+
+        incomplete = [
+            {"id": i["id"], "description": i.get("description", ""), "nodes_count": len(i.get("nodes", []))}
+            for i in results.get("incomplete", [])
+        ]
+
+        by_impact = {"critical": 0, "serious": 0, "moderate": 0, "minor": 0}
+        for v in violations:
+            impact = v.get("impact", "minor")
+            if impact in by_impact:
+                by_impact[impact] += 1
+
+        output = {
+            "page_id": page_id,
+            "url": full_url,
+            "scanned_at": __import__("datetime").datetime.utcnow().isoformat() + "Z",
+            "engine": "axe-core@4.9.1",
+            "violations": violations,
+            "passes_count": len(results.get("passes", [])),
+            "incomplete": incomplete,
+            "violations_by_impact": by_impact
+        }
+
+        write_json(output_path, output)
+        log_success(f"a11y-{page_id}.json — {sum(by_impact.values())} violations")
+
+    except Exception as e:
+        log_error(f"Erreur {page_id} : {e}")
+        errs = read_json(ERRORS_PATH) or []
+        errs.append({"script": "07-a11y-scan.py", "page_id": page_id, "error": str(e)})
+        write_json(ERRORS_PATH, errs)
+    finally:
+        await page.close()
+
+
+async def main():
+    log_phase(7, "A11y Scan", ["page-map.json"], [".audit/a11y/a11y-{page-id}.json"])
+    ensure_dir(OUTPUT_DIR)
+
+    page_map = read_json(PAGE_MAP_PATH)
+    if not page_map:
+        log_error("page-map.json introuvable — lancez d'abord 03-build-page-map.py")
+        return
+
+    env = load_env()
+    auth_config = get_auth_config(env)
+    pages = [p for p in page_map.get("pages", []) if p.get("screenshot_path")]
+
+    log_step(f"{len(pages)} pages à scanner")
+
+    async with async_playwright() as pw:
+        browser = await pw.chromium.launch()
+        context = await browser.new_context(
+            viewport={"width": int(env.get("SCREENSHOT_VIEWPORT_WIDTH", 1440)),
+                      "height": int(env.get("SCREENSHOT_VIEWPORT_HEIGHT", 900))},
+            storage_state=auth_config.get("storage_state") if auth_config.get("type") == "sso" else None
+        )
+        for page_info in pages:
+            await scan_page(context, page_info, [])
+        await browser.close()
+
+    log_success("07-a11y-scan.py terminé")
+
+if __name__ == "__main__":
+    asyncio.run(main())
+```
+
+---
+
+## ÉTAPE 11 — Créer scripts/08-dom-inventory.py
+
+**Rôle :** Inventorie tous les éléments interactifs de chaque page avec leurs positions et tailles réelles.
+
+**Inputs :** `.audit/page-map.json`, `.audit/.env`
+**Output :** `.audit/dom/dom-{page-id}.json` par page
+
+**Ce qu'il fait :**
+1. Pour chaque page avec `screenshot_path` :
+   - Navigue vers l'URL via Playwright
+   - Exécute une évaluation JS qui collecte tous les éléments interactifs :
+     `querySelectorAll('a, button, input, select, textarea, [role="button"], [role="link"], [tabindex]')`
+   - Pour chaque élément : tag, type, texte visible (`innerText.trim()`), `getBoundingClientRect()`, aria-label, aria-role, disabled, tabIndex
+   - Calcule si l'élément est `in_viewport` (y < window.innerHeight au chargement)
+   - Produit le JSON conforme au schéma
+
+**Point d'attention :** Les éléments dans des iframes ou des Shadow DOM ne sont pas inventoriés — documenter cette limite dans le JSON output (`"limitations": ["iframes non inventoriées", "shadow DOM non traversé"]`).
+
+---
+
+## ÉTAPE 12 — Créer scripts/09-semantic-structure.py
+
+**Rôle :** Extrait la structure sémantique HTML réelle de chaque page — headings, landmarks, ARIA, images, formulaires.
+
+**Inputs :** `.audit/page-map.json`
+**Output :** `.audit/semantic/semantic-{page-id}.json` par page
+
+**Ce qu'il fait :**
+1. Navigue vers chaque page
+2. **Headings :** `querySelectorAll('h1, h2, h3, h4, h5, h6')` → texte + niveau + position Y
+3. **Validation de hiérarchie :** détecte les sauts de niveau (H1 suivi directement de H3)
+4. **Landmarks :** `querySelector` pour chaque balise sémantique
+5. **Multiple `<nav>` :** vérifie si chaque `<nav>` a un `aria-label` ou `aria-labelledby` distinct
+6. **Images :** `querySelectorAll('img')` → présence de `alt`, valeur de `alt`
+7. **Formulaires :** pour chaque `<form>`, cherche ses `<input>`, `<select>`, `<textarea>` et vérifie si chacun a un `<label>` associé (par `for`, par `aria-label`, ou par `aria-labelledby`)
+8. **Skip links :** cherche les liens avec des classes ou hrefs typiques (`#main-content`, `#skip`, `.skip-link`)
+9. **Lang attribute :** lit `document.documentElement.lang`
+
+---
+
+## ÉTAPE 13 — Créer scripts/10-readability.py
+
+**Rôle :** Extrait les textes substantiels de chaque page et calcule des scores de lisibilité.
+
+**Inputs :** `.audit/page-map.json`
+**Output :** `.audit/readability/readability-{page-id}.json` par page
+
+**Ce qu'il fait :**
+1. Pour chaque page, extrait les blocs de texte via JS :
+   `querySelectorAll('p, li, td, .description, [class*="content"], [class*="text"]')`
+2. Filtre les blocs avec moins de 50 mots (trop courts pour être significatifs)
+3. Pour chaque bloc substantiel, calcule :
+   - Nombre de mots, phrases
+   - Longueur moyenne des phrases (mots/phrase)
+   - Longueur moyenne des mots (chars/mot)
+   - Nombre de phrases longues (>25 mots)
+   - **Score Flesch-Kincaid adapté au français :**
+     `score = 207 - (1.015 × mots_par_phrase) - (73.6 × syllabes_par_mot)`
+     (Formule de Flesch adaptée par Kandel & Moles pour le français)
+4. Extrait séparément tous les labels courts : boutons, liens, headings, placeholders
+5. Pour chaque CTA, détecte si le texte commence par un verbe (liste de verbes d'action communs en FR/EN)
+
+**Dépendances Python :**
+- `pyphen` pour la syllabation française (`pip install pyphen --break-system-packages`)
+
+**Limites documentées :** Les textes chargés dynamiquement après le `networkidle` peuvent manquer. Les textes dans des images ne sont pas analysés.
+
+---
+
+## ÉTAPE 14 — Créer scripts/11-touch-targets.py
+
+**Rôle :** Mesure la taille réelle de chaque élément interactif en mode mobile viewport.
+
+**Inputs :** `.audit/page-map.json`, `.audit/.env` (`SCREENSHOT_MOBILE_WIDTH`)
+**Output :** `.audit/touch-targets/touch-{page-id}.json` par page
+
+**Ce qu'il fait :**
+1. Ouvre chaque page en mode mobile (`SCREENSHOT_MOBILE_WIDTH` × 812px)
+2. Collecte tous les éléments interactifs (même sélecteur que `08-dom-inventory.py`)
+3. Pour chaque élément : `getBoundingClientRect()` → width, height, x, y
+4. Applique le seuil `44×44px` (configurable en variable `TOUCH_TARGET_THRESHOLD_PX` dans `.env`)
+5. Calcule la distance au target le plus proche :
+   - Pour chaque paire de targets, calcule la distance entre leurs bords (pas leurs centres)
+   - Flag les paires avec moins de 8px entre elles (`crowded_targets`)
+6. Produit un summary avec le taux de non-conformité et le plus petit target identifié
+
+**Note :** Ce script est distinct de `04-screenshot.py` mobile — il ne capture pas de screenshot, il mesure. Il peut être lancé même si `SCREENSHOT_MOBILE=false`.
+
+---
+
+## ÉTAPE 15 — Créer scripts/12-nav-keyboard.py
+
+**Rôle :** Simule une navigation clavier complète et inventorie l'ordre de focus, les indicateurs visuels, et les anomalies.
+
+**Inputs :** `.audit/page-map.json`, `.audit/.env`
+**Output :** `.audit/keyboard-nav/keyboard-{page-id}.json` par page
+
+**Ce qu'il fait :**
+1. Navigue vers chaque page
+2. Appuie sur Tab en boucle (max 200 fois pour éviter les boucles infinies)
+3. À chaque Tab :
+   - Récupère `document.activeElement` : tag, selector, texte visible
+   - Prend un screenshot partiel (bounding box de l'élément actif) pour capturer l'indicateur de focus visuel
+   - Évalue si `outline` est `none` ou `0px` via `getComputedStyle(document.activeElement).outline`
+   - Enregistre la position y de l'élément
+4. Détecte les **focus traps** : si après 10 Tabs consécutifs on revient au même élément sans avoir fait le tour de la page
+5. Détecte les **éléments non atteignables** : croise la liste des éléments interactifs de `dom-{page-id}.json` avec la séquence Tab — les éléments présents dans le DOM mais absents de la séquence sont des candidats `unreachable`
+6. Détecte les **tabindex positifs** : `querySelectorAll('[tabindex]')` → filtre `tabIndex > 0`
+7. Calcule un `keyboard_score` :
+   - Base : 100
+   - -10 par focus trap
+   - -2 par élément sans indicateur de focus
+   - -5 par saut illogique d'ordre
+   - -5 par élément interactif non atteignable
+
+---
+
+## ÉTAPE 16 — Créer scripts/13-contrast-real.py
+
+**Rôle :** Mesure les ratios de contraste réels en sampant les pixels du screenshot — pas depuis le CSS.
+
+**Inputs :** `.audit/page-map.json`, screenshots dans `.audit/screenshots/`
+**Output :** `.audit/contrast-real/contrast-{page-id}.json` par page
+
+**Dépendances :**
+- `Pillow` (PIL) pour la lecture de pixels (`pip install Pillow --break-system-packages`)
+
+**Ce qu'il fait :**
+1. Lit le screenshot existant de la page (`screenshot_path` dans `page-map.json`)
+2. Lit `semantic-{page-id}.json` pour la liste des sélecteurs de texte (headings, labels, paragraphes)
+3. Lit `dom-{page-id}.json` pour les positions exactes des éléments textuels
+4. Pour chaque élément textuel avec une position connue :
+   - Ouvre le screenshot avec Pillow
+   - Sample un pixel "texte" au centre approximatif de l'élément (x + width/2, y + height/2)
+   - Sample plusieurs pixels de "fond" autour de l'élément (les 4 coins extérieurs)
+   - Calcule la luminance relative de chaque couleur sampée (formule WCAG)
+   - Calcule le ratio de contraste : `(L1 + 0.05) / (L2 + 0.05)`
+   - Détermine si c'est du "grand texte" (>18px ou >14px bold) pour appliquer le bon seuil WCAG
+5. Si le fond est un dégradé ou une image (variance élevée des pixels sampés), note `"note": "fond complexe — valeur approximative"`
+
+**Limites documentées :** Précision de ±0.3 sur le ratio due au sampling pixel. Les textes rendus sur Canvas ou WebGL ne sont pas mesurables.
+
+---
+
+## ÉTAPE 17 — Créer scripts/14-motion-audit.py
+
+**Rôle :** Parse tous les fichiers CSS/SCSS du projet pour inventorier les animations et transitions.
+
+**Inputs :** `project-map.json` (liste des fichiers CSS/SCSS)
+**Output :** `.audit/motion/motion-audit.json` (un seul fichier global — pas par page)
+
+**Ce qu'il fait :**
+1. Lit tous les fichiers CSS et SCSS listés dans `project-map.json`
+2. **Animations (@keyframes) :**
+   - Regex pour détecter `@keyframes {nom}` et leur bloc
+   - Parse la propriété `animation-duration` dans le bloc `animation:` de chaque sélecteur
+   - Convertit toutes les durées en millisecondes (gère `s` et `ms`)
+   - Cherche les sélecteurs qui utilisent chaque animation
+3. **Transitions :**
+   - Regex pour détecter `transition: {property} {duration} {easing}`
+   - Pour chaque transition, extrait le sélecteur, la propriété, la durée
+   - Flag si durée > 300ms ET si le sélecteur est un élément interactif (contient `button`, `a`, `input`, `.btn`, `[role="button"]`, `:hover`, `:focus`)
+4. **prefers-reduced-motion :**
+   - Cherche `@media (prefers-reduced-motion: reduce)` dans tous les fichiers
+   - Pour chaque animation/transition dans ce media query, la marque comme "couverte"
+   - Calcule le nombre d'animations/transitions non couvertes
+5. Flag `infinite_animations` (tout ce qui a `animation-iteration-count: infinite`)
+
+---
+
+## ÉTAPE 18 — Mettre à jour agents/11-ihm-auditor.md
+
+**Action :** Ajouter une section **"## Données de mesure disponibles"** en entête de l'agent, avant la grille d'évaluation :
+
+```markdown
+## Données de mesure disponibles
+
+Avant d'analyser le screenshot, l'agent lit les fichiers de mesure suivants si disponibles :
+
+- `.audit/a11y/a11y-{page-id}.json` → violations WCAG réelles, par sélecteur
+- `.audit/semantic/semantic-{page-id}.json` → structure headings, landmarks, images sans alt
+- `.audit/keyboard-nav/keyboard-{page-id}.json` → focus indicators, traps, ordre de tab
+- `.audit/contrast-real/contrast-{page-id}.json` → ratios de contraste réels par élément
+
+**Règle :** si ces fichiers existent, les observations IHM doivent les citer.
+Format : `[a11y-{page-id}.json: violations.critical=3, dont color-contrast×2]`
+
+**Règle anti-réinvention :** l'agent ne recalcule pas ce que les scripts ont déjà mesuré.
+Il interprète, contextualise par rapport aux personas, et priorise.
+
+Les sous-scores Nielsen sont calculés en croisant :
+- Les violations axe-core → heuristiques 5 (prévention erreurs) et 6 (reconnaissance vs rappel)
+- La structure sémantique → heuristique 4 (cohérence et standards)
+- La navigation clavier → heuristique 3 (contrôle et liberté)
+- Les ratios de contraste → heuristique 8 (design esthétique et minimaliste) + WCAG
+```
+
+**Et mettre à jour le score WCAG dans la grille :**
+
+```markdown
+**6. Accessibilité (WCAG 2.1) — données mesurées**
+
+Si `a11y-{page-id}.json` existe :
+- Lister les violations critical et serious par critère WCAG (ex: "1.4.3 Contrast: 2 violations")
+- Lister les éléments du schéma `semantic-{page-id}.json` non conformes (images sans alt, formulaires sans label)
+- Scorer par niveau :
+  - Niveau A violations bloquantes → score plancher à max 40/100 pour la sous-section WCAG
+  - Niveau AA violations → -5 points par violation serious
+  - Niveau AA violations → -2 points par violation moderate
+
+Si `a11y-{page-id}.json` n'existe pas :
+- Analyser depuis le screenshot et le code source
+- Taguer chaque observation `[inférence — non mesuré]`
+```
+
+---
+
+## ÉTAPE 19 — Mettre à jour agents/10-webdesign-auditor.md
+
+**Action :** Ajouter une section **"## Données de mesure disponibles"** :
+
+```markdown
+## Données de mesure disponibles
+
+- `.audit/touch-targets/touch-{page-id}.json` → taille réelle des cibles tactiles en mobile
+- `.audit/motion/motion-audit.json` → animations et transitions avec durées
+
+**Pour Touch Targets :**
+Si `touch-{page-id}.json` existe, remplacer toute observation estimée par les données mesurées.
+Format : `[touch-{page-id}.json: 17/43 targets sous 44px (40%), dont .btn-primary 28×24px]`
+
+**Pour Motion :**
+Si `motion-audit.json` existe, citer les animations flaggées par nom et durée.
+Format : `[motion-audit.json: transition .modal-overlay 450ms non couverte par prefers-reduced-motion]`
+```
+
+---
+
+## ÉTAPE 20 — Mettre à jour agents/18-wording-auditor.md
+
+**Action :** Ajouter une section **"## Données de mesure disponibles"** :
+
+```markdown
+## Données de mesure disponibles
+
+- `.audit/readability/readability-{page-id}.json` → scores de lisibilité et CTA inventoriés
+
+**Si `readability-{page-id}.json` existe :**
+- Utiliser `global_summary.dominant_reading_level` comme donnée objective au lieu d'estimer
+- Utiliser `global_summary.ctas_starting_with_verb` pour le critère "qualité des CTAs"
+- Citer les blocs spécifiques avec leur score Flesch : `[readability-{page-id}.json: bloc .description score=28 — très difficile]`
+- Utiliser `ctas_and_labels` comme corpus de base (complété par l'analyse visuelle du screenshot)
+```
+
+---
+
+## ÉTAPE 21 — Mettre à jour agents/07-graphisme-auditor.md
+
+**Action :** Ajouter une section **"## Données de mesure disponibles"** :
+
+```markdown
+## Données de mesure disponibles
+
+- `.audit/contrast-real/contrast-{page-id}.json` → ratios de contraste réels
+
+**Si `contrast-{page-id}.json` existe :**
+Le graphisme auditor utilise ces données pour l'axe "Contraste valeurs tonales".
+Il ne se contente plus d'une estimation visuelle — il cite les ratios mesurés.
+Distinction importante : le graphisme auditor évalue le contraste comme outil graphique
+(l'esthétique, la hiérarchie tonale), pas la conformité légale (domaine de l'IHM).
+Format : `[contrast-{page-id}.json: ratio fond/texte principal=4.8:1 — correct WCAG mais faible graphiquement pour un titre H1]`
+```
+
+---
+
+## ÉTAPE 22 — Mettre à jour agents/00b-quality-gate.md
+
+**Action :** Ajouter les vérifications post-Phase 1 pour les nouveaux scripts :
+
+```markdown
+**Vérifications additionnelles après Phase 1 (v4) :**
+
+Pour chaque page dans `page-map.json` ayant `screenshot_path` non null :
+- `.audit/a11y/a11y-{page-id}.json` existe → OK, warning sinon
+- `.audit/dom/dom-{page-id}.json` existe → OK, warning sinon
+- `.audit/semantic/semantic-{page-id}.json` existe → OK, warning sinon
+- `.audit/readability/readability-{page-id}.json` existe → OK, warning sinon (non bloquant)
+- `.audit/touch-targets/touch-{page-id}.json` existe si `SCREENSHOT_MOBILE=true` → OK, warning sinon
+
+Fichiers globaux :
+- `.audit/motion/motion-audit.json` existe → OK, warning sinon (non bloquant)
+- `.audit/contrast-real/contrast-{page-id}.json` → non bloquant si absent (dépend de Pillow)
+
+Ces vérifications sont des **warnings, pas des blocages.** Un script de mesure absent ne bloque
+pas le pipeline — les agents fonctionnent en mode dégradé (inférence depuis screenshot).
+Le gate signale les angles morts dans son output avec `"status": "warning"`.
+```
+
+---
+
+## ÉTAPE 23 — Mettre à jour agents/15-report-generator.md
+
+**Action :** Ajouter une section dans le rapport sur la couverture de mesure :
+
+```markdown
+## Couverture de mesure automatisée
+
+En début de rapport, après le résumé exécutif, ajouter un tableau de disponibilité des données :
+
+| Script | Données | Disponible | Pages couvertes |
+|---|---|---|---|
+| 07-a11y-scan | Violations WCAG axe-core | ✓/✗ | N/total |
+| 08-dom-inventory | Inventaire éléments interactifs | ✓/✗ | N/total |
+| 09-semantic-structure | Structure HTML sémantique | ✓/✗ | N/total |
+| 10-readability | Scores lisibilité | ✓/✗ | N/total |
+| 11-touch-targets | Taille cibles tactiles | ✓/✗ | N/total |
+| 12-nav-keyboard | Navigation clavier | ✓/✗ | N/total |
+| 13-contrast-real | Ratios contraste réels | ✓/✗ | N/total |
+| 14-motion-audit | Animations/transitions | ✓/✗ | Global |
+
+Note : Les agents opèrent en mode "inférence depuis screenshot" pour les données manquantes.
+Les observations basées sur des mesures sont marquées [mesuré], les inférences sont marquées [inféré].
+```
+
+---
+
+## ÉTAPE 24 — Mettre à jour agents/00-orchestrator.md
+
+**Action :** Ajouter les nouveaux scripts à la Phase 1 :
+
+```markdown
+## Phase 1 — Discovery (ordre d'exécution)
+
+1. `python3 scripts/02-discover.py`
+2. `python3 scripts/03-build-page-map.py`
+3. `python3 scripts/04-screenshot.py`
+4. **Scripts de mesure (parallélisables entre eux, après le screenshot) :**
+   - `python3 scripts/07-a11y-scan.py`
+   - `python3 scripts/08-dom-inventory.py`
+   - `python3 scripts/09-semantic-structure.py`
+   - `python3 scripts/10-readability.py`
+   - `python3 scripts/11-touch-targets.py`
+   - `python3 scripts/12-nav-keyboard.py`
+   - `python3 scripts/13-contrast-real.py`
+   - `python3 scripts/14-motion-audit.py`
+5. `python3 scripts/05-extract-tokens.py`
+6. `python3 scripts/00b-estimate-run.py` (si DRY_RUN=true)
+
+**Règle de parallélisation des scripts de mesure :**
+Ces scripts peuvent être lancés en parallèle (ils n'ont pas de dépendances entre eux)
+mais chacun ouvre son propre contexte Playwright. Sur un projet avec beaucoup de pages,
+limiter à 3 scripts en parallèle simultané pour éviter la surcharge mémoire.
+```
+
+---
+
+## ÉTAPE 25 — Mettre à jour scripts/01-check-deps.sh
+
+**Action :** Ajouter la vérification des nouvelles dépendances Python :
+
+```bash
+# Dépendances v4 — scripts de mesure
+echo "Vérification des dépendances v4..."
+
+# axe-core — injecté via CDN, pas de dépendance locale
+echo "✓ axe-core — injecté via CDN (pas d'installation locale requise)"
+
+# Pillow (pour contrast-real.py)
+python3 -c "import PIL" 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "✗ Pillow manquant (requis pour 13-contrast-real.py)"
+    echo "  Installer : pip install Pillow --break-system-packages"
+    echo "  Note : non bloquant — contrast-real.py sera skippé si absent"
+else
+    echo "✓ Pillow"
+fi
+
+# pyphen (pour 10-readability.py)
+python3 -c "import pyphen" 2>/dev/null
+if [ $? -ne 0 ]; then
+    echo "✗ pyphen manquant (requis pour 10-readability.py)"
+    echo "  Installer : pip install pyphen --break-system-packages"
+    echo "  Note : non bloquant — readability.py utilisera une estimation syllabique simplifiée"
+else
+    echo "✓ pyphen"
+fi
+```
+
+---
+
+## ÉTAPE 26 — Mettre à jour .claude-plugin/plugin.json → v0.4.0
+
+```json
+{
+  "name": "deep-ux",
+  "version": "0.4.0",
+  "scripts": [
+    "00-bootstrap.sh",
+    "01-check-deps.sh",
+    "02-discover.py",
+    "03-build-page-map.py",
+    "04-screenshot.py",
+    "05-extract-tokens.py",
+    "06-export-session-helper.py",
+    "00b-estimate-run.py",
+    "07-a11y-scan.py",
+    "08-dom-inventory.py",
+    "09-semantic-structure.py",
+    "10-readability.py",
+    "11-touch-targets.py",
+    "12-nav-keyboard.py",
+    "13-contrast-real.py",
+    "14-motion-audit.py"
+  ],
+  "agents": [
+    "00-orchestrator",
+    "00b-quality-gate",
+    "01-interview-conductor",
+    "02-capability-mapper",
+    "03-token-extractor-agent",
+    "04-persona-builder",
+    "05-brand-auditor",
+    "06-benchmark-researcher",
+    "07-graphisme-auditor",
+    "08-ui-auditor",
+    "09-ux-auditor",
+    "10-webdesign-auditor",
+    "11-ihm-auditor",
+    "12-screen-dispatcher",
+    "13-consistency-checker",
+    "14-functional-gap-analyst",
+    "15-report-generator",
+    "16-coverage-auditor",
+    "17-contradiction-detector",
+    "18-wording-auditor",
+    "19-ia-auditor",
+    "20-contextual-gaps-auditor"
+  ],
+  "commands": ["run", "diff"],
+  "skills": ["ux-audit"]
+}
+```
+
+---
+
+## 9. Progression v4
+
+CC coche chaque item après création ou modification :
+
+### Bootstrap et dépendances
+- [ ] `scripts/00-bootstrap.sh` (nouveaux dossiers de mesure)
+- [ ] `scripts/01-check-deps.sh` (Pillow, pyphen)
+
+### Nouveaux schémas
+- [ ] `schemas/a11y-raw.schema.json`
+- [ ] `schemas/dom-inventory.schema.json`
+- [ ] `schemas/semantic-structure.schema.json`
+- [ ] `schemas/readability.schema.json`
+- [ ] `schemas/touch-targets.schema.json`
+- [ ] `schemas/keyboard-nav.schema.json`
+- [ ] `schemas/contrast-real.schema.json`
+- [ ] `schemas/motion-audit.schema.json`
+
+### Nouveaux scripts
+- [ ] `scripts/07-a11y-scan.py`
+- [ ] `scripts/08-dom-inventory.py`
+- [ ] `scripts/09-semantic-structure.py`
+- [ ] `scripts/10-readability.py`
+- [ ] `scripts/11-touch-targets.py`
+- [ ] `scripts/12-nav-keyboard.py`
+- [ ] `scripts/13-contrast-real.py`
+- [ ] `scripts/14-motion-audit.py`
+
+### Agents mis à jour
+- [ ] `agents/11-ihm-auditor.md` (données mesurées + scoring WCAG)
+- [ ] `agents/10-webdesign-auditor.md` (touch targets + motion)
+- [ ] `agents/18-wording-auditor.md` (readability scores)
+- [ ] `agents/07-graphisme-auditor.md` (contrast-real)
+- [ ] `agents/00b-quality-gate.md` (vérifications v4 Phase 1)
+- [ ] `agents/15-report-generator.md` (tableau couverture mesure)
+- [ ] `agents/00-orchestrator.md` (Phase 1 avec scripts de mesure)
+
+### Plugin manifest
+- [ ] `.claude-plugin/plugin.json` (v0.4.0 avec scripts listés)
