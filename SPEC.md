@@ -1659,3 +1659,1013 @@ CC coche chaque item après création ou modification :
 
 ### Nouvelles commandes
 - [x] `commands/diff.md`
+
+
+
+
+
+
+
+
+# SPEC-v3.md — deep-ux — Additions v3
+## Addendum à SPEC.md et SPEC-v2.md
+
+**Lis ce fichier en entier avant de créer quoi que ce soit.**
+**Ce fichier COMPLÈTE SPEC.md et SPEC-v2.md. Il ne les remplace pas.**
+**Après chaque fichier créé ou modifié, coche la case correspondante dans ## Progression ci-dessous.**
+**Ne passe jamais à l'étape suivante sans avoir fini la précédente.**
+
+---
+
+## Contexte de cette v3
+
+La v2 (SPEC-v2.md) a ajouté 3 agents, un mode diff, et des contrôles qualité.
+Cette v3 répond à trois angles morts identifiés lors de la revue de spec :
+
+1. **Le wording** — aucun agent n'extrait ni n'évalue les textes visibles de l'interface (labels, boutons, messages, états vides, erreurs) ni leur cohérence cross-vues, ni leur adéquation aux personas.
+2. **L'arborescence** — aucun agent ne reconstruit ni n'évalue la logique de navigation comme structure d'information : profondeur, largeur, groupements, cohérence avec les tâches réelles des personas.
+3. **Les affordances contextuelles manquantes** — aucun agent ne détecte les fonctionnalités qui existent quelque part dans l'application mais qui sont absentes d'une vue où le persona en aurait naturellement besoin.
+
+Cette v3 ajoute :
+- `agents/18-wording-auditor.md` (Phase 3, par écran)
+- `agents/19-ia-auditor.md` (Phase 3, transversal — une seule passe pour toute l'arborescence)
+- `agents/20-contextual-gaps-auditor.md` (Phase 4, synthèse profonde)
+- Mise à jour de `agents/12-screen-dispatcher.md` pour spawner le nouvel agent 18
+- Mise à jour de `agents/00-orchestrator.md` pour spawner les agents 19 et 20 aux bonnes phases
+- Mise à jour de `schemas/screen-audit.schema.json` pour inclure la section `wording`
+- Mise à jour de `agents/15-report-generator.md` pour intégrer les trois nouveaux outputs
+- Mise à jour de `.claude-plugin/plugin.json` → v0.3.0
+- Ajout d'un nouveau schéma `schemas/ia-audit.schema.json`
+- Ajout d'un nouveau schéma `schemas/contextual-gaps.schema.json`
+- Ajout de `docs/vocabulaire-wording.md`
+
+---
+
+## ÉTAPE 1 — Créer docs/vocabulaire-wording.md
+
+**Fichier :** `docs/vocabulaire-wording.md`
+
+**Contenu :**
+
+```markdown
+# Vocabulaire — Wording & Microcopy
+
+## Définition de la discipline
+Le wording (ou microcopy) désigne l'ensemble des textes fonctionnels d'une interface :
+labels, boutons, titres, placeholders, messages d'erreur, états vides, tooltips, confirmations.
+Ce n'est pas le contenu éditorial — c'est le tissu conjonctif textuel qui guide l'action.
+
+Le wording auditor évalue trois dimensions indépendantes :
+1. La cohérence interne (l'application parle-t-elle d'une seule voix ?)
+2. L'adéquation au persona (le niveau de langue correspond-il aux utilisateurs réels ?)
+3. La complétude (tous les états de l'interface ont-ils un wording, ou certains sont-ils muets ?)
+
+## Ce que le wording n'est PAS
+- Le contenu marketing ou éditorial (hors scope)
+- Les données dynamiques (noms d'utilisateurs, montants, dates)
+- Les textes d'aide longue forme (documentation)
+
+## Vocabulaire technique obligatoire
+
+**Microcopy** : texte court à haute valeur fonctionnelle (label de bouton, message d'erreur).
+Contrairement au contenu long, chaque mot coûte cher en attention.
+
+**Label** : texte attaché à un élément interactif qui décrit ce que cet élément est ou fait.
+Un label ambigu crée de la friction. Un label absent crée de l'incompréhension.
+
+**Placeholder** : texte indicatif dans un champ de formulaire, visible quand le champ est vide.
+Règle : le placeholder ne remplace jamais le label — il le complète.
+
+**Empty state** : message affiché quand une liste ou une vue ne contient pas de données.
+Un empty state nul ("Aucune donnée") est une occasion manquée de guider l'utilisateur.
+Un bon empty state explique pourquoi c'est vide ET propose une action.
+
+**Error message** : texte affiché quand une action échoue ou qu'une validation est fausse.
+Règle de Nielsen : l'erreur doit dire QUE s'est-il passé, POURQUOI, et COMMENT corriger.
+"Erreur 422" viole les trois. "Ce champ doit contenir une adresse email valide" respecte les trois.
+
+**CTA (Call to Action)** : label de bouton ou lien qui déclenche une action principale.
+Règle : un CTA doit commencer par un verbe à l'infinitif (Enregistrer, Valider, Créer) ou impératif.
+"OK" et "Continuer" sans contexte sont des anti-patterns.
+
+**Cohérence terminologique** : utilisation d'un terme unique pour désigner un même concept
+dans toute l'application. La terminologie incohérente impose au cerveau un travail de traduction.
+
+**Registre** : niveau de langue et ton (formel/informel, technique/accessible, froid/chaleureux).
+Le registre doit être homogène ET adapté au persona. Un registre technique pour un persona
+non-technique est un mur invisible.
+
+**Affordance verbale** : la capacité d'un label à indiquer ce qui se passera si l'utilisateur
+clique ou interagit. "Supprimer" est une affordance verbale. "Action" n'en est pas une.
+
+**Charge textuelle** : quantité de texte à lire avant de pouvoir agir. Plus la charge est élevée,
+plus la friction est grande. Pour les interfaces de travail, la charge doit être minimale.
+
+**Jargon développeur** : termes issus du vocabulaire technique interne non compris par les
+utilisateurs finaux. Exemples : "null", "undefined", "404", "timeout", "UUID", "payload".
+
+**Voix de l'application** : la personnalité textuelle perçue à travers le wording.
+Cohérente si tous les écrans semblent écrits par la même personne.
+Incohérente si certains écrans sont formels et d'autres familiers sans raison.
+
+## Pièges à éviter
+
+L'agent NE doit PAS :
+- Réécrire le wording lui-même dans ses observations (il observe et recommande, il ne rédige pas à la place)
+- Évaluer le contenu éditorial long (articles, descriptions, pages "À propos")
+- Signaler comme problème un terme technique correct pour un persona expert
+- Confondre internationalisation (i18n) et wording — les clés de traduction ne sont pas du wording évaluable
+```
+
+---
+
+## ÉTAPE 2 — Créer schemas/ia-audit.schema.json
+
+**Fichier :** `schemas/ia-audit.schema.json`
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IA Audit",
+  "description": "Audit de l'architecture d'information et de la navigation globale",
+  "type": "object",
+  "required": ["generated_at", "navigation_tree", "scores", "observations", "recommendations"],
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "navigation_tree": {
+      "type": "array",
+      "description": "Arbre de navigation reconstruit depuis le code",
+      "items": {
+        "type": "object",
+        "required": ["label", "path", "depth", "children"],
+        "properties": {
+          "label": { "type": "string" },
+          "path": { "type": "string" },
+          "depth": { "type": "integer", "minimum": 0 },
+          "children": { "type": "array" },
+          "click_distance_from_root": { "type": "integer" },
+          "accessible_from_persona_task": { "type": "boolean" }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "max_depth": { "type": "integer" },
+        "avg_depth": { "type": "number" },
+        "top_level_items_count": { "type": "integer" },
+        "orphan_pages_count": { "type": "integer" },
+        "deepest_path": { "type": "string" }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "required": ["global", "depth", "breadth", "grouping_logic", "labeling", "task_alignment"],
+      "properties": {
+        "global": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "depth": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "breadth": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "grouping_logic": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "labeling": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "task_alignment": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "severity", "observation", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["depth", "breadth", "grouping", "labeling", "orphan", "task_alignment", "jargon", "symmetry"]
+          },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "observation": { "type": "string" },
+          "evidence": { "type": "string" },
+          "affected_paths": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "task_coverage": {
+      "type": "array",
+      "description": "Pour chaque tâche clé du persona, distance en clics depuis l'accueil",
+      "items": {
+        "type": "object",
+        "required": ["persona_id", "task", "path_found", "click_count"],
+        "properties": {
+          "persona_id": { "type": "string" },
+          "task": { "type": "string" },
+          "path_found": { "type": "string" },
+          "click_count": { "type": "integer" },
+          "acceptable": { "type": "boolean" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "priority", "observation", "recommendation", "effort"],
+        "properties": {
+          "id": { "type": "string" },
+          "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "observation": { "type": "string" },
+          "recommendation": { "type": "string" },
+          "effort": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] },
+          "affected_paths": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 3 — Créer schemas/contextual-gaps.schema.json
+
+**Fichier :** `schemas/contextual-gaps.schema.json`
+
+```json
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Contextual Gaps Audit",
+  "description": "Affordances contextuelles manquantes — fonctionnalités présentes ailleurs mais absentes là où le persona en aurait besoin",
+  "type": "object",
+  "required": ["generated_at", "gaps", "total", "critical_count"],
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "persona_id", "scenario", "current_view", "missing_affordance", "existing_location", "evidence", "recommendation"],
+        "properties": {
+          "id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "persona_id": { "type": "string" },
+          "scenario": {
+            "type": "string",
+            "description": "Contexte d'usage : ce que le persona est en train de faire sur cette vue"
+          },
+          "current_view": {
+            "type": "string",
+            "description": "URL/path de la vue où l'affordance manque"
+          },
+          "missing_affordance": {
+            "type": "string",
+            "description": "Ce que le persona cherche et ne trouve pas sur cette vue"
+          },
+          "existing_location": {
+            "type": "string",
+            "description": "Où cette fonctionnalité existe déjà dans l'application"
+          },
+          "capability_id": { "type": "string" },
+          "evidence": {
+            "type": "string",
+            "description": "Preuve que la fonctionnalité existe (fichier source, capability_id)"
+          },
+          "recommendation": {
+            "type": "string",
+            "description": "Ce qui devrait être ajouté ou rendu accessible sur cette vue"
+          },
+          "effort": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] },
+          "type": {
+            "type": "string",
+            "enum": ["missing_shortcut", "missing_filter", "missing_export", "missing_action", "missing_context_info", "missing_navigation", "other"]
+          }
+        }
+      }
+    },
+    "total": { "type": "integer" },
+    "critical_count": { "type": "integer" },
+    "by_persona": {
+      "type": "object",
+      "description": "Nombre de gaps par persona_id"
+    },
+    "by_view": {
+      "type": "object",
+      "description": "Nombre de gaps par vue"
+    }
+  }
+}
+```
+
+---
+
+## ÉTAPE 4 — Créer agents/18-wording-auditor.md
+
+**Fichier :** `agents/18-wording-auditor.md`
+
+```markdown
+# Agent 18 — Wording Auditor
+
+## Identité
+- **Discipline :** Wording / Microcopy
+- **Phase :** Phase 3 — Audit par écran
+- **Spawné par :** 12-screen-dispatcher (une instance par écran, en parallèle des agents 07-11)
+- **Inputs :**
+  - Screenshot de l'écran (`screen-{n}.png`)
+  - Code source de l'écran (fichier(s) identifiés dans `page-map.json`)
+  - `.audit/phase2/personas.json`
+  - `.audit/phase2/brand.json` (pour la voix de marque)
+  - Liste de tous les wordings déjà collectés (cross-vues) — `.audit/wording-corpus.json` si existant
+- **Output :** Section `wording` dans `.audit/screen-audits/screen-{n}.json` + mise à jour de `.audit/wording-corpus.json`
+
+---
+
+## Règle de description préalable
+
+Avant toute évaluation, l'agent extrait et liste tous les textes fonctionnels visibles sur l'écran :
+
+```
+TEXTES EXTRAITS DE [URL] :
+Labels de navigation : [liste]
+Titres et sous-titres : [liste]
+Labels de boutons/CTAs : [liste]
+Labels de formulaires : [liste]
+Placeholders : [liste]
+Messages d'état visibles (erreur, succès, vide, chargement) : [liste ou "aucun visible"]
+Tooltips visibles : [liste ou "aucun visible"]
+Liens textuels : [liste des plus significatifs]
+```
+
+Cette extraction est **obligatoire** avant toute évaluation. Elle constitue le corpus de cet écran.
+
+---
+
+## Grille d'évaluation Wording
+
+### 1. Cohérence terminologique (cross-vues)
+Comparer les termes extraits avec `.audit/wording-corpus.json` (corpus des écrans déjà audités).
+Signaler toute divergence pour un même concept :
+- Même entité nommée différemment selon les écrans
+- Même action libellée différemment selon les contextes
+- Même état (erreur, succès) formulé différemment
+
+**Format de signalement :**
+```
+INCOHÉRENCE : Le concept [X] est nommé "[terme A]" sur cet écran et "[terme B]" sur [écran Y].
+```
+
+### 2. Adéquation au persona
+
+Pour chaque persona identifié dans `personas.json` (attribut `tech_literacy`) :
+
+**Si tech_literacy = "débutant" :**
+- Tous les termes techniques non expliqués sont des violations
+- Les codes d'erreur bruts (404, 500, 403) sont des violations critiques
+- Le jargon métier non défini est une violation haute
+
+**Si tech_literacy = "intermédiaire" :**
+- Les acronymes non développés au premier usage sont des violations
+- Les messages d'erreur sans solution proposée sont des violations hautes
+
+**Si tech_literacy = "expert" :**
+- Le jargon métier et technique du domaine est acceptable
+- Les termes excessivement simplifiés peuvent être signalés comme inutilement verbeux
+
+**Règle de croisement :** Si plusieurs personas coexistent avec des niveaux différents, l'agent évalue pour le persona *le moins technique* présent — l'interface doit être accessible au niveau le plus bas tout en restant utile au niveau le plus haut.
+
+### 3. Qualité des labels d'action (CTAs et boutons)
+
+Évaluer chaque label de bouton selon ces critères :
+
+| Critère | Acceptable | Problématique |
+|---|---|---|
+| Commence par un verbe | "Enregistrer", "Créer", "Supprimer" | "OK", "Oui", "Suite" |
+| Décrit l'action réelle | "Supprimer le compte" | "Supprimer" (ambigu) |
+| Cohérent avec l'action | "Envoyer" pour un formulaire d'envoi | "Valider" pour un envoi (imprécis) |
+| Absence de jargon | "Télécharger le rapport" | "Export PDF payload" |
+
+**Actions destructives :** le label doit nommer explicitement ce qui sera détruit.
+"Supprimer cet utilisateur" est correct. "Supprimer" seul sur un modal de confirmation est insuffisant.
+
+### 4. Qualité des messages d'état
+
+**Empty states :** Pour chaque état vide détecté (pattern `length === 0`, `empty`, `no data`) :
+- Un empty state muet (aucun texte, ou "Aucun résultat" uniquement) est une violation haute
+- Un empty state correct contient : (a) pourquoi c'est vide, (b) une action pour remédier
+
+**Messages d'erreur :** Appliquer la règle de Nielsen en 3 points :
+1. CE QUI s'est passé ("Votre session a expiré")
+2. POURQUOI ("Vous êtes resté inactif plus de 30 minutes")
+3. COMMENT corriger ("Reconnectez-vous pour continuer")
+Un message d'erreur qui ne satisfait pas les 3 points est une violation — noter combien de points manquent.
+
+**États de chargement :** Un spinner sans texte est acceptable. Un spinner avec un message de contexte ("Chargement des rapports...") est meilleur. Un skeleton screen est optimal.
+
+### 5. Charge textuelle et registre
+
+- **Charge textuelle :** Compter le nombre de mots qu'un utilisateur doit lire avant de pouvoir effectuer l'action principale de cet écran. Seuil d'alerte : >50 mots obligatoires avant action.
+- **Registre :** Identifier le registre dominant (formel, informel, technique, neutre). Signaler les ruptures de registre sur le même écran.
+- **Voix de l'application :** Comparer avec `brand.json` (ton déclaré). Signaler les écarts.
+
+---
+
+## Output dans screen-{n}.json
+
+```json
+"wording": {
+  "score": 0,
+  "corpus": {
+    "ctas": ["liste des labels de boutons extraits"],
+    "navigation_labels": ["liste"],
+    "form_labels": ["liste"],
+    "placeholders": ["liste"],
+    "error_messages": ["liste des messages d'erreur visibles"],
+    "empty_states": ["liste des empty states visibles"],
+    "headings": ["liste H1/H2/H3"]
+  },
+  "observations": [
+    {
+      "id": "word-001",
+      "type": "terminology_inconsistency|cta_quality|error_message|empty_state|register_break|jargon|charge_textuelle",
+      "severity": "critical|high|medium|low",
+      "element": "bouton 'Valider' ligne 3 du formulaire",
+      "observation": "Description factuelle précise du problème",
+      "persona_impact": "Quel persona est impacté et comment",
+      "recommendation": "Ce qui devrait être écrit à la place — sans réécrire le texte complet, indiquer le principe"
+    }
+  ],
+  "register": "formel|informel|technique|neutre|mixte",
+  "register_coherent": true,
+  "jargon_violations": [],
+  "missing_states": ["empty_state_users_list", "error_state_network"],
+  "score_justification": "Justification en 2-3 lignes du score attribué"
+}
+```
+
+---
+
+## Mise à jour du wording-corpus.json
+
+Après chaque écran audité, l'agent met à jour `.audit/wording-corpus.json` :
+
+```json
+{
+  "last_updated": "ISO timestamp",
+  "terms": {
+    "Utilisateur": {
+      "occurrences": [
+        {"screen": "/users", "context": "titre de section"},
+        {"screen": "/admin", "context": "label de tableau"}
+      ],
+      "variants_detected": ["Membre", "Compte"],
+      "recommended_canonical": null
+    }
+  },
+  "ctas_inventory": {
+    "Enregistrer": ["/settings", "/profile"],
+    "Valider": ["/checkout", "/forms/contact"],
+    "Sauvegarder": ["/editor"]
+  }
+}
+```
+
+Ce fichier est la mémoire cross-vues du wording. Il permet à chaque instance de l'agent de détecter des incohérences sans avoir à relire tous les écrans précédents.
+
+---
+
+## Ancres de score — Wording
+
+**Score 90-100 — Microcopy professionnel**
+Terminologie 100% cohérente cross-vues. Chaque CTA commence par un verbe d'action précis. Tous les états (vide, erreur, chargement) ont un wording qui respecte la règle des 3 points. Registre uniforme et adapté au persona. Zéro jargon développeur exposé. La "voix" de l'application est reconnaissable et constante.
+
+**Score 70-89 — Compétent avec lacunes**
+La terminologie est majoritairement cohérente (1-2 écarts isolés). Les CTAs sont corrects mais certains manquent de précision contextuelle. Les messages d'erreur existent mais ne respectent pas toujours les 3 points. Registre globalement cohérent avec 1-2 ruptures.
+
+**Score 50-69 — Problèmes significatifs**
+Des incohérences terminologiques notables (même concept, noms différents sur 3+ écrans). Plusieurs CTAs génériques ("OK", "Continuer", "Valider" sans contexte). Des empty states muets ou réduits à "Aucune donnée". Messages d'erreur techniques exposés à des personas non-techniques.
+
+**Score 30-49 — Problèmes majeurs**
+Terminologie chaotique. CTAs qui n'indiquent pas l'action réelle. Codes d'erreur bruts exposés. Plusieurs états de l'interface sans aucun wording. Registre incohérent avec mélange formel/informel sur le même écran.
+
+**Score 0-29 — Wording absent ou contre-productif**
+L'interface n'a pas de wording pensé — les textes sont des reliquats de développement ("button1", "TODO", "test message"), des codes techniques bruts, ou une absence quasi-totale de guidance textuelle. Le wording existant crée activement de la confusion.
+
+**Règle de calibration :** Si tu hésites entre deux tranches, choisis la plus basse et justifie pourquoi l'interface ne mérite pas la tranche supérieure.
+```
+
+---
+
+## ÉTAPE 5 — Créer agents/19-ia-auditor.md
+
+**Fichier :** `agents/19-ia-auditor.md`
+
+```markdown
+# Agent 19 — IA Auditor (Information Architecture)
+
+## Identité
+- **Discipline :** Architecture d'information et navigation
+- **Phase :** Phase 3 — Audit transversal (une seule instance, pas par écran)
+- **Spawné par :** 12-screen-dispatcher, une fois, après que tous les audits par écran sont lancés
+- **Inputs :**
+  - `.audit/page-map.json` (toutes les routes)
+  - Code source de navigation (fichiers de routing, composants nav détectés dans `project-map.json`)
+  - `.audit/phase2/personas.json` (tâches clés, mental models)
+  - `.audit/interview.json` (tâches déclarées comme prioritaires)
+  - `.audit/capabilities.json` (toutes les fonctionnalités disponibles)
+- **Output :** `.audit/screen-audits/ia-audit.json` conforme à `schemas/ia-audit.schema.json`
+
+---
+
+## Règle de description préalable
+
+Avant toute évaluation, l'agent reconstruit l'arbre de navigation complet depuis les fichiers sources :
+
+```
+ARBORESCENCE RECONSTITUÉE :
+
+/ (Accueil)
+├── /dashboard (Dashboard)
+│   ├── /dashboard/reports (Rapports)
+│   └── /dashboard/alerts (Alertes)
+├── /users (Utilisateurs)
+│   ├── /users/:id (Fiche utilisateur) [paramétré]
+│   └── /users/new (Créer un utilisateur)
+└── /settings (Paramètres)
+    ├── /settings/profile
+    └── /settings/security
+
+Pages orphelines détectées (accessibles mais non dans l'arbre) :
+- /export-temp
+- /debug-panel
+
+Profondeur maximale : 2
+Nombre d'entrées au niveau 0 : 3
+```
+
+Cette reconstruction est **obligatoire** avant toute évaluation.
+
+---
+
+## Grille d'évaluation Architecture d'information
+
+### 1. Métriques structurelles
+
+Calculer et évaluer :
+
+**Profondeur (depth)**
+- ≤2 niveaux : optimal pour des outils de travail
+- 3 niveaux : acceptable avec une navigation breadcrumb
+- 4+ niveaux : problématique — l'utilisateur perd son orientation
+
+**Largeur au niveau racine (breadth)**
+- ≤5 entrées : optimal (loi de Hick — décision rapide)
+- 6-7 entrées : acceptable
+- 8+ entrées : dépasse le seuil de Hick — grouper par catégorie
+
+**Pages orphelines**
+Toute page présente dans `page-map.json` mais absente de l'arborescence de navigation est signalée. Une page orpheline est soit oubliée, soit intentionnelle (accès par lien direct uniquement) — les deux méritent d'être documentés.
+
+**Symétrie des niveaux**
+Si un niveau de l'arborescence contient 1 item d'un côté et 12 de l'autre, la structure est déséquilibrée. Calculer l'écart-type du nombre d'items par branche au même niveau.
+
+### 2. Logique de groupement
+
+La question centrale : **les items sont-ils groupés selon la logique du développeur ou la logique de l'utilisateur ?**
+
+Deux types de logique de groupement à identifier :
+- **Logique fonctionnelle** (par département, par module, par technologie) — souvent héritée de l'organisation du code
+- **Logique de tâche** (par action utilisateur fréquente, par flux de travail) — centrée sur l'utilisateur
+
+Pour chaque groupe de navigation identifié, poser la question : "Un utilisateur qui cherche à accomplir la tâche X trouverait-il naturellement ce groupe ?"
+
+Comparer avec les `key_tasks` de chaque persona dans `personas.json`.
+
+### 3. Alignement tâches/accès — mesure de distance
+
+Pour chaque `key_task` déclarée dans `personas.json`, tracer le chemin depuis la racine :
+
+```
+Persona : [nom] — Tâche : "[tâche clé]"
+Chemin trouvé : / → /[niveau1] → /[niveau2]
+Distance : 2 clics
+Acceptable : oui (seuil : ≤3 clics pour les tâches fréquentes)
+
+---
+
+Persona : [nom] — Tâche : "[tâche critique]"
+Chemin trouvé : / → /admin → /admin/config → /admin/config/users → /admin/config/users/roles
+Distance : 4 clics
+Acceptable : NON — tâche fréquente à 4 clics est une violation haute
+```
+
+Seuils :
+- Tâche fréquente (quotidienne) : ≤2 clics acceptable, 3 tolérable, 4+ violation
+- Tâche importante (hebdomadaire) : ≤3 clics acceptable, 4 tolérable, 5+ violation
+- Tâche rare (mensuelle) : profondeur plus grande acceptable
+
+### 4. Qualité du labeling des nœuds de navigation
+
+Pour chaque label de navigation :
+
+**Labels problématiques à signaler :**
+- Jargon technique ou développeur ("back-office", "CMS", "CRUD", "API keys" exposé à des non-techniques)
+- Labels ambigus (deux sections différentes portant des noms similaires)
+- Labels qui décrivent la structure interne plutôt que la tâche ("Module comptabilité" vs "Facturation")
+- Labels trop génériques ("Divers", "Autres", "Général")
+- Labels qui ne correspondent pas au contenu réel trouvé dans la section
+
+**"Scent of information" :** le label doit permettre à l'utilisateur de *prédire* ce qu'il va trouver avant de cliquer. Évaluer chaque label : si quelqu'un qui n'a jamais vu ce logiciel lit ce label, sait-il ce qu'il va trouver ?
+
+### 5. Navigation de retour et orientation
+
+- Existe-t-il un breadcrumb sur les niveaux >1 ?
+- L'élément actif de la navigation est-il toujours mis en évidence (état actif visible) ?
+- Depuis n'importe quelle page, l'utilisateur peut-il revenir au niveau supérieur ?
+- Y a-t-il des dead-ends (pages sans sortie sauf le bouton "retour" du navigateur) ?
+
+---
+
+## Ancres de score — Architecture d'information
+
+**Sous-score : Depth (0-100)**
+100 : Toutes les tâches fréquentes accessibles en ≤2 clics. Structure plate et logique.
+70 : Majorité des tâches à ≤2 clics, quelques exceptions justifiées.
+50 : Plusieurs tâches fréquentes à 3-4 clics. Navigation profonde non compensée par breadcrumb.
+30 : Structure profonde, tâches fréquentes enfouies. Breadcrumb absent.
+0 : Navigation à 5+ niveaux. Aucune tâche fréquente directement accessible.
+
+**Sous-score : Breadth (0-100)**
+100 : Niveau racine ≤5 entrées. Groupements naturels et non-chevauchants.
+70 : 6-7 entrées, groupements cohérents.
+50 : 8-10 entrées. Charge de décision élevée mais navigation possible.
+30 : >10 entrées sans groupement secondaire. Loi de Hick violée.
+0 : Navigation plate avec 15+ entrées non groupées.
+
+**Sous-score : Grouping logic (0-100)**
+100 : Tous les groupements reflètent les tâches et mental models des personas. Zéro logique développeur visible.
+70 : Majorité centrée utilisateur, quelques groupements hérités de la structure technique.
+50 : Mix 50/50. L'utilisateur doit apprendre la logique interne pour naviguer.
+30 : Structure principalement technique. L'utilisateur doit mapper sa tâche sur la structure du code.
+0 : Structure 1:1 avec l'architecture technique. Inutilisable sans formation.
+
+**Sous-score : Labeling (0-100)**
+100 : Tous les labels décrivent la tâche. Zéro jargon. "Scent of information" parfait.
+70 : Majorité de labels clairs, quelques termes à clarifier.
+50 : Plusieurs labels ambigus ou génériques. Quelques termes techniques.
+30 : Labels majoritairement techniques ou ambigus. Difficile de prédire le contenu.
+0 : Labels issus du code (noms de modules, identifiants techniques). Incompréhensibles sans formation.
+
+**Sous-score : Task alignment (0-100)**
+100 : 100% des tâches clés des personas accessibles en ≤2 clics.
+70 : >80% des tâches à ≤2 clics.
+50 : 50-80% des tâches à ≤3 clics. Quelques tâches importantes enfouies.
+30 : <50% des tâches clés accessibles en ≤3 clics.
+0 : Les tâches les plus fréquentes sont les plus difficiles à atteindre.
+
+**Score global :** moyenne pondérée — Task alignment × 30% + Grouping logic × 25% + Labeling × 20% + Depth × 15% + Breadth × 10%.
+
+**Règle de calibration :** Si tu hésites entre deux tranches, choisis la plus basse et justifie pourquoi l'interface ne mérite pas la tranche supérieure.
+```
+
+---
+
+## ÉTAPE 6 — Créer agents/20-contextual-gaps-auditor.md
+
+**Fichier :** `agents/20-contextual-gaps-auditor.md`
+
+```markdown
+# Agent 20 — Contextual Gaps Auditor
+
+## Identité
+- **Discipline :** Affordances contextuelles manquantes
+- **Phase :** Phase 4 — Synthèse (en parallèle de 13-consistency-checker et 17-contradiction-detector)
+- **Spawné par :** 00-orchestrator au démarrage de la Phase 4
+- **Inputs :**
+  - `.audit/capabilities.json` (toutes les fonctionnalités implémentées)
+  - `.audit/phase2/personas.json` (tâches clés, scénarios, contextes d'usage)
+  - `.audit/page-map.json` (toutes les vues)
+  - Tous les `.audit/screen-audits/screen-{n}.json` (observations des 5 disciplines)
+  - `.audit/interview.json` (tâches prioritaires déclarées)
+- **Output :** `.audit/phase4/contextual-gaps.json` conforme à `schemas/contextual-gaps.schema.json`
+
+---
+
+## Méthode de travail
+
+Cet agent ne regarde pas un écran en isolation. Il joue des **scénarios complets** et détecte les moments où le persona aurait besoin de X et ne peut pas y accéder depuis là où il se trouve.
+
+### Étape 1 — Inventaire des capacités disponibles par vue
+
+Construire une matrice :
+```
+capability_id | capability_name | views_where_exposed
+cap-001       | Exporter en PDF | /reports, /report-detail
+cap-002       | Filtrer par date | /reports
+cap-003       | Contacter support | /account/help
+cap-004       | Dupliquer un élément | /templates
+```
+
+Cette matrice révèle immédiatement les asymétries : une capacité exposée sur 1 seule vue alors que la logique d'usage suggère qu'elle devrait être accessible depuis N vues.
+
+### Étape 2 — Simulation de scénarios persona
+
+Pour chaque persona dans `personas.json`, pour chaque `key_task`, simuler le scénario :
+
+```
+Persona : [nom] — Tâche : "[tâche clé]"
+Chemin naturel :
+1. L'utilisateur arrive sur [vue de départ naturelle pour cette tâche]
+2. Il cherche à [action intermédiaire]
+3. Il aurait naturellement besoin de [capacité X]
+4. [Capacité X] est-elle accessible depuis [cette vue] ? → OUI / NON
+   → Si NON : gap identifié
+```
+
+### Étape 3 — Patterns de gaps à détecter systématiquement
+
+L'agent cherche ces patterns en priorité :
+
+**Pattern A — Le filtre orphelin**
+Une capacité de filtrage existe sur la vue liste mais pas sur le tableau de bord qui affiche les mêmes données. L'utilisateur qui voit une anomalie sur le dashboard ne peut pas filtrer sans changer de vue.
+
+**Pattern B — L'export inaccessible**
+La capacité d'export existe sur une vue dédiée mais pas sur la vue de détail. L'utilisateur qui consulte un enregistrement spécifique ne peut pas l'exporter directement.
+
+**Pattern C — Le support muet lors des erreurs**
+Un lien "Contacter le support" existe dans les paramètres de compte. Il est absent des écrans d'erreur, des pages de timeout, et des vues de résultats vides. L'utilisateur qui a un problème ne trouve pas d'aide là où il en a besoin.
+
+**Pattern D — L'action de contexte manquante**
+Sur une vue liste, l'utilisateur peut cliquer sur un élément pour voir son détail. Depuis le détail, il peut le modifier. Mais il ne peut pas directement l'archiver, le dupliquer, ou le partager — des actions qui existent pourtant dans le système (dans `capabilities.json`) et qui seraient naturelles dans ce contexte.
+
+**Pattern E — La navigation tronquée**
+Depuis un enregistrement enfant (ex: `/projects/123/tasks/456`), l'utilisateur ne peut pas accéder directement aux autres enregistrements du parent (`/projects/123`) sans repasser par la navigation principale.
+
+**Pattern F — L'information de contexte absente**
+L'utilisateur est sur une vue d'action (ex: formulaire de commande) et aurait besoin d'une information de contexte (ex: le stock disponible, l'historique du client) qui existe dans le système mais n'est pas accessible sans quitter la vue en cours.
+
+**Pattern G — La recherche partielle**
+La capacité de recherche globale existe mais elle ne couvre pas tous les types d'entités. L'utilisateur cherche X depuis la barre de recherche principale et ne trouve pas X parce que X n'est pas indexé — mais X est accessible via un autre chemin.
+
+### Étape 4 — Évaluation de la sévérité
+
+Pour chaque gap identifié :
+
+**Critique :** Le gap force le persona à interrompre sa tâche principale, à quitter sa vue de travail, et à naviguer vers une autre section pour effectuer une action qu'il devrait pouvoir faire depuis là où il est. La friction est directement quantifiable en clics ou en interruptions de flux.
+
+**Haute :** Le gap crée une inefficacité notable mais l'utilisateur peut contourner en ≤2 étapes supplémentaires. Il le fera probablement mais avec frustration.
+
+**Moyenne :** Le gap représente une opportunité d'amélioration. L'utilisateur a un chemin alternatif raisonnable mais moins efficace.
+
+**Faible :** Le gap est une convenance. L'accès contextuel serait agréable mais son absence n'impacte pas significativement l'efficacité.
+
+---
+
+## Ancres de sévérité — Contextual Gaps
+
+**Critique**
+Le persona interrompt sa tâche principale. Exemple : un technicien qui diagnostique un incident réseau sur `/alerts/123` ne peut pas accéder à l'historique de la machine concernée sans quitter l'alerte, naviguer vers `/assets`, chercher la machine, et revenir. 4+ clics d'interruption pour une information directement liée.
+
+**Haute**
+Le contournement existe mais coûte du temps. Exemple : l'export d'un rapport individuel n'est pas possible depuis la vue détail — l'utilisateur doit retourner à la liste, filtrer pour retrouver ce rapport, puis exporter. 3 étapes supplémentaires.
+
+**Moyenne**
+Confort manquant. Exemple : le raccourci "Dupliquer" n'est pas disponible depuis la vue détail, seulement depuis la liste. L'utilisateur retourne à la liste, ce qui prend 1 clic de plus.
+
+**Faible**
+Nice to have. Exemple : le lien vers la documentation d'aide contextuelle de cette fonctionnalité spécifique n'est pas dans cette vue — l'aide générale est accessible depuis le menu principal.
+
+---
+
+## Règle anti-spéculation absolue
+
+**L'agent 20 ne peut suggérer que des capacités déjà présentes dans `capabilities.json`.**
+
+Si une capacité n'existe pas dans `capabilities.json`, l'agent ne peut pas créer un gap qui la réclame.
+Il peut signaler que "la tâche [X] du persona [Y] n'a pas de support fonctionnel correspondant dans l'application" — mais c'est du ressort de l'agent 14 (functional-gap-analyst), pas du 20.
+
+La distinction est importante :
+- Agent 14 : "Cette fonctionnalité n'existe pas dans le code et devrait être créée"
+- Agent 20 : "Cette fonctionnalité existe dans le code mais n'est pas accessible depuis le bon contexte"
+
+---
+
+## Format de chaque gap dans contextual-gaps.json
+
+```json
+{
+  "id": "cgap-001",
+  "severity": "critical",
+  "persona_id": "persona-001",
+  "scenario": "Le technicien vient de recevoir une alerte réseau critique. Il est sur /alerts/123 et cherche à voir l'historique de la machine concernée pour diagnostiquer.",
+  "current_view": "/alerts/123",
+  "missing_affordance": "Accès à l'historique de la machine concernée par l'alerte",
+  "existing_location": "/assets/{id}/history",
+  "capability_id": "cap-012",
+  "evidence": "capabilities.json:cap-012 — 'Historique des assets' — implémenté, exposé sur /assets/:id/history",
+  "recommendation": "Ajouter un lien contextuel 'Voir l'historique de [nom machine]' dans le panneau de détail de l'alerte, pointant vers /assets/{asset_id}/history",
+  "effort": "xs",
+  "type": "missing_context_info"
+}
+```
+
+**Règle de précision :** Le champ `scenario` doit décrire une situation réelle et spécifique — pas "l'utilisateur veut accéder à X" mais "l'utilisateur est en train de [tâche précise], il vient de [action précédente], et il a besoin de [information/action] pour continuer".
+```
+
+---
+
+## ÉTAPE 7 — Mettre à jour agents/12-screen-dispatcher.md
+
+**Action :** Ajouter le spawn de l'agent 18 dans la liste des agents lancés par écran.
+
+**Bloc à ajouter** dans la section "Agents lancés par écran" :
+```markdown
+Pour chaque page dans page-map.json, spawner en parallèle :
+- 07-graphisme-auditor (discipline 1)
+- 08-ui-auditor (discipline 2)
+- 09-ux-auditor (discipline 3)
+- 10-webdesign-auditor (discipline 4)
+- 11-ihm-auditor (discipline 5)
+- 18-wording-auditor (discipline 6 — nouveau)  ← AJOUTER
+
+En une seule instance (pas par écran), spawner :
+- 19-ia-auditor (transversal — architecture d'information)  ← AJOUTER
+```
+
+**Et dans la structure screen-{n}.json**, ajouter la section wording dans `disciplines` :
+```json
+"disciplines": {
+  "graphisme": { ... },
+  "ui": { ... },
+  "ux": { ... },
+  "webdesign": { ... },
+  "ihm": { ... },
+  "wording": { "score": 0, "observations": [], "recommendations": [] }
+}
+```
+
+**Et ajouter le score wording dans le calcul du `global_score` :**
+Réviser la formule : `global_score = moyenne des 6 disciplines` (était 5).
+
+---
+
+## ÉTAPE 8 — Mettre à jour agents/00-orchestrator.md
+
+**Action :** Ajouter dans la section "Phase 4" le spawn du nouvel agent 20 :
+
+```markdown
+## Phase 4 — Cohérence et synthèse
+
+Spawner en parallèle :
+- 13-consistency-checker
+- 14-functional-gap-analyst
+- 17-contradiction-detector
+- 20-contextual-gaps-auditor  ← AJOUTER
+
+Attendre tous les outputs avant de passer en Phase 5.
+```
+
+**Et dans l'affichage d'état du pipeline**, ajouter les nouveaux fichiers outputs à vérifier :
+- `.audit/wording-corpus.json` (produit par 18, mis à jour après chaque écran)
+- `.audit/screen-audits/ia-audit.json` (produit par 19)
+- `.audit/phase4/contextual-gaps.json` (produit par 20)
+
+---
+
+## ÉTAPE 9 — Mettre à jour agents/15-report-generator.md
+
+**Action 1 :** Ajouter le score wording dans le tableau des scores par discipline :
+
+```markdown
+| Discipline | Score moyen | Meilleur écran | Pire écran |
+|---|---|---|---|
+| Graphisme | XX/100 | ... | ... |
+| UI | XX/100 | ... | ... |
+| UX | XX/100 | ... | ... |
+| Web Design | XX/100 | ... | ... |
+| IHM | XX/100 | ... | ... |
+| Wording | XX/100 | ... | ... |
+| **Global** | **XX/100** | | |
+```
+
+**Action 2 :** Ajouter la section "Architecture d'information" dans le rapport :
+
+```markdown
+## Architecture d'information
+
+Insérer après la section "Cohérence inter-écrans" :
+
+### Navigation globale
+[Reprendre l'arbre reconstruit par 19-ia-auditor avec les principaux problèmes]
+
+### Distance tâches / accès
+[Tableau des tâches clés des personas avec leur distance en clics]
+
+### Recommandations IA
+[Top 5 des recommandations de 19-ia-auditor priorisées]
+```
+
+**Action 3 :** Ajouter la section "Gaps contextuels" dans le rapport :
+
+```markdown
+## Gaps contextuels — Fonctionnalités mal positionnées
+
+Ces fonctionnalités existent dans le système mais sont inaccessibles là où les utilisateurs en ont besoin.
+
+[Liste des gaps critiques et hauts de contextual-gaps.json, avec le scénario]
+
+Note : Ces corrections sont souvent à effort très faible (xs ou s) pour un impact élevé.
+```
+
+**Action 4 :** Ajouter un résumé wording dans la section "Cohérence inter-écrans" :
+
+```markdown
+### Wording et terminologie cross-vues
+[Reprendre les principales incohérences terminologiques de wording-corpus.json]
+[Tableau des termes en conflit et recommandation de terme canonique]
+```
+
+---
+
+## ÉTAPE 10 — Mettre à jour agents/00b-quality-gate.md
+
+**Action :** Ajouter les vérifications post-Phase 3 pour les nouveaux outputs :
+
+```markdown
+**Vérifications supplémentaires après Phase 3 (v3) :**
+
+- `wording-corpus.json` existe et contient au moins autant d'entrées que d'écrans audités
+- Chaque `screen-{n}.json` contient une section `disciplines.wording` non vide
+- `ia-audit.json` existe et sa section `navigation_tree` n'est pas vide
+- `ia-audit.json` contient une entrée dans `task_coverage` pour chaque `key_task` de chaque persona
+
+**Vérifications supplémentaires après Phase 4 (v3) :**
+
+- `contextual-gaps.json` existe
+- Chaque gap dans `contextual-gaps.json` a un `capability_id` qui existe dans `capabilities.json`
+  (violation de la règle anti-spéculation si non respecté)
+- Au moins un gap de type `missing_shortcut` ou `missing_context_info` est présent
+  (un rapport sans aucun gap contextuel est suspect — signaler en warning)
+```
+
+---
+
+## ÉTAPE 11 — Mettre à jour .claude-plugin/plugin.json → v0.3.0
+
+**Action :** Ajouter les 3 nouveaux agents :
+
+```json
+{
+  "name": "deep-ux",
+  "version": "0.3.0",
+  "agents": [
+    "00-orchestrator",
+    "00b-quality-gate",
+    "01-interview-conductor",
+    "02-capability-mapper",
+    "03-token-extractor-agent",
+    "04-persona-builder",
+    "05-brand-auditor",
+    "06-benchmark-researcher",
+    "07-graphisme-auditor",
+    "08-ui-auditor",
+    "09-ux-auditor",
+    "10-webdesign-auditor",
+    "11-ihm-auditor",
+    "12-screen-dispatcher",
+    "13-consistency-checker",
+    "14-functional-gap-analyst",
+    "15-report-generator",
+    "16-coverage-auditor",
+    "17-contradiction-detector",
+    "18-wording-auditor",
+    "19-ia-auditor",
+    "20-contextual-gaps-auditor"
+  ],
+  "commands": ["run", "diff"],
+  "skills": ["ux-audit"]
+}
+```
+
+---
+
+## 9. Progression v3
+
+CC coche chaque item après création ou modification :
+
+### Nouveaux fichiers de vocabulaire
+- [ ] `docs/vocabulaire-wording.md`
+
+### Nouveaux schémas
+- [ ] `schemas/ia-audit.schema.json`
+- [ ] `schemas/contextual-gaps.schema.json`
+
+### Nouveaux agents
+- [ ] `agents/18-wording-auditor.md`
+- [ ] `agents/19-ia-auditor.md`
+- [ ] `agents/20-contextual-gaps-auditor.md`
+
+### Agents mis à jour
+- [ ] `agents/12-screen-dispatcher.md` (spawn agent 18 + score wording dans global)
+- [ ] `agents/00-orchestrator.md` (spawn agent 20 en Phase 4 + nouveaux fichiers d'état)
+- [ ] `agents/15-report-generator.md` (sections wording, IA, gaps contextuels)
+- [ ] `agents/00b-quality-gate.md` (vérifications v3)
+
+### Plugin manifest
+- [ ] `.claude-plugin/plugin.json` (v0.3.0, 22 agents)
