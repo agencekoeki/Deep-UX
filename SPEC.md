@@ -971,68 +971,68 @@ CC doit construire les fichiers dans cet ordre exact :
 CC coche chaque item après création :
 
 ### Fichiers de base
-- [ ] `.gitignore`
-- [ ] `.audit-template/.env.example`
-- [ ] `.audit-template/.gitignore`
+- [x] `.gitignore`
+- [x] `.audit-template/.env.example`
+- [x] `.audit-template/.gitignore`
 
 ### Schemas
-- [ ] `schemas/interview.schema.json`
-- [ ] `schemas/capabilities.schema.json`
-- [ ] `schemas/design-tokens.schema.json`
-- [ ] `schemas/project-map.schema.json`
-- [ ] `schemas/personas.schema.json`
-- [ ] `schemas/brand.schema.json`
-- [ ] `schemas/screen-audit.schema.json`
-- [ ] `schemas/consistency.schema.json`
-- [ ] `schemas/functional-gaps.schema.json`
-- [ ] `schemas/report-cc-tasks.schema.json`
+- [x] `schemas/interview.schema.json`
+- [x] `schemas/capabilities.schema.json`
+- [x] `schemas/design-tokens.schema.json`
+- [x] `schemas/project-map.schema.json`
+- [x] `schemas/personas.schema.json`
+- [x] `schemas/brand.schema.json`
+- [x] `schemas/screen-audit.schema.json`
+- [x] `schemas/consistency.schema.json`
+- [x] `schemas/functional-gaps.schema.json`
+- [x] `schemas/report-cc-tasks.schema.json`
 
 ### Docs vocabulaire
-- [ ] `docs/vocabulaire-graphisme.md`
-- [ ] `docs/vocabulaire-ui.md`
-- [ ] `docs/vocabulaire-ux.md`
-- [ ] `docs/vocabulaire-webdesign.md`
-- [ ] `docs/vocabulaire-ihm.md`
-- [ ] `docs/grille-evaluation.md`
-- [ ] `docs/anti-drift-rules.md`
+- [x] `docs/vocabulaire-graphisme.md`
+- [x] `docs/vocabulaire-ui.md`
+- [x] `docs/vocabulaire-ux.md`
+- [x] `docs/vocabulaire-webdesign.md`
+- [x] `docs/vocabulaire-ihm.md`
+- [x] `docs/grille-evaluation.md`
+- [x] `docs/anti-drift-rules.md`
 
 ### Scripts lib
-- [ ] `scripts/lib/auth.py`
-- [ ] `scripts/lib/file_utils.py`
-- [ ] `scripts/lib/progress.py`
+- [x] `scripts/lib/auth.py`
+- [x] `scripts/lib/file_utils.py`
+- [x] `scripts/lib/progress.py`
 
 ### Scripts principaux
-- [ ] `scripts/00-bootstrap.sh`
-- [ ] `scripts/01-check-deps.sh`
-- [ ] `scripts/02-discover.py`
-- [ ] `scripts/03-build-page-map.py`
-- [ ] `scripts/04-screenshot.py`
-- [ ] `scripts/05-extract-tokens.py`
-- [ ] `scripts/06-export-session-helper.py`
+- [x] `scripts/00-bootstrap.sh`
+- [x] `scripts/01-check-deps.sh`
+- [x] `scripts/02-discover.py`
+- [x] `scripts/03-build-page-map.py`
+- [x] `scripts/04-screenshot.py`
+- [x] `scripts/05-extract-tokens.py`
+- [x] `scripts/06-export-session-helper.py`
 
 ### Skill
-- [ ] `skills/ux-audit/SKILL.md`
+- [x] `skills/ux-audit/SKILL.md`
 
 ### Command
-- [ ] `commands/run.md`
+- [x] `commands/run.md`
 
 ### Agents
-- [ ] `agents/00-orchestrator.md`
-- [ ] `agents/01-interview-conductor.md`
-- [ ] `agents/02-capability-mapper.md`
-- [ ] `agents/03-token-extractor-agent.md`
-- [ ] `agents/04-persona-builder.md`
-- [ ] `agents/05-brand-auditor.md`
-- [ ] `agents/06-benchmark-researcher.md`
-- [ ] `agents/07-graphisme-auditor.md`
-- [ ] `agents/08-ui-auditor.md`
-- [ ] `agents/09-ux-auditor.md`
-- [ ] `agents/10-webdesign-auditor.md`
-- [ ] `agents/11-ihm-auditor.md`
-- [ ] `agents/12-screen-dispatcher.md`
-- [ ] `agents/13-consistency-checker.md`
-- [ ] `agents/14-functional-gap-analyst.md`
-- [ ] `agents/15-report-generator.md`
+- [x] `agents/00-orchestrator.md`
+- [x] `agents/01-interview-conductor.md`
+- [x] `agents/02-capability-mapper.md`
+- [x] `agents/03-token-extractor-agent.md`
+- [x] `agents/04-persona-builder.md`
+- [x] `agents/05-brand-auditor.md`
+- [x] `agents/06-benchmark-researcher.md`
+- [x] `agents/07-graphisme-auditor.md`
+- [x] `agents/08-ui-auditor.md`
+- [x] `agents/09-ux-auditor.md`
+- [x] `agents/10-webdesign-auditor.md`
+- [x] `agents/11-ihm-auditor.md`
+- [x] `agents/12-screen-dispatcher.md`
+- [x] `agents/13-consistency-checker.md`
+- [x] `agents/14-functional-gap-analyst.md`
+- [x] `agents/15-report-generator.md`
 
 ### Plugin manifest
-- [ ] `.claude-plugin/plugin.json` (mise à jour finale)
+- [x] `.claude-plugin/plugin.json` (mise à jour finale)

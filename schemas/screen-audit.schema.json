@@ -1,0 +1,90 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Screen Audit",
+  "description": "Audit complet d'un écran par les 5 disciplines (graphisme, UI, UX, webdesign, IHM)",
+  "type": "object",
+  "required": ["page_id", "page_url", "screenshot_path", "audited_at", "disciplines", "global_score", "critical_issues", "quick_wins"],
+  "properties": {
+    "page_id": { "type": "string" },
+    "page_url": { "type": "string" },
+    "screenshot_path": { "type": "string" },
+    "audited_at": { "type": "string", "format": "date-time" },
+    "disciplines": {
+      "type": "object",
+      "required": ["graphisme", "ui", "ux", "webdesign", "ihm"],
+      "properties": {
+        "graphisme": { "$ref": "#/definitions/discipline_result" },
+        "ui": { "$ref": "#/definitions/discipline_result" },
+        "ux": { "$ref": "#/definitions/discipline_result" },
+        "webdesign": { "$ref": "#/definitions/discipline_result" },
+        "ihm": {
+          "allOf": [
+            { "$ref": "#/definitions/discipline_result" },
+            {
+              "type": "object",
+              "properties": {
+                "nielsen_scores": {
+                  "type": "object",
+                  "properties": {
+                    "h1": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h2": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h3": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h4": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h5": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h6": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h7": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h8": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h9": { "type": "integer", "minimum": 0, "maximum": 100 },
+                    "h10": { "type": "integer", "minimum": 0, "maximum": 100 }
+                  }
+                }
+              }
+            }
+          ]
+        }
+      }
+    },
+    "global_score": { "type": "integer", "minimum": 0, "maximum": 100 },
+    "critical_issues": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/recommendation" }
+    },
+    "quick_wins": {
+      "type": "array",
+      "items": { "$ref": "#/definitions/recommendation" }
+    }
+  },
+  "definitions": {
+    "discipline_result": {
+      "type": "object",
+      "required": ["score", "observations", "recommendations"],
+      "properties": {
+        "score": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "observations": {
+          "type": "array",
+          "items": { "type": "string" }
+        },
+        "recommendations": {
+          "type": "array",
+          "items": { "$ref": "#/definitions/recommendation" }
+        }
+      }
+    },
+    "recommendation": {
+      "type": "object",
+      "required": ["id", "discipline", "priority", "type", "observation", "recommendation", "capability_id", "speculation", "effort"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^rec-[0-9]+$" },
+        "discipline": { "type": "string", "enum": ["graphisme", "ui", "ux", "webdesign", "ihm"] },
+        "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+        "type": { "type": "string", "enum": ["visual", "functional", "content", "structural"] },
+        "observation": { "type": "string" },
+        "recommendation": { "type": "string" },
+        "capability_id": { "type": ["string", "null"] },
+        "speculation": { "type": "boolean" },
+        "effort": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] },
+        "wcag_criterion": { "type": ["string", "null"] }
+      }
+    }
+  }
+}

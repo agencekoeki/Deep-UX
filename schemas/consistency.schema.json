@@ -1,0 +1,38 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Consistency Check",
+  "description": "Analyse de cohérence inter-écrans",
+  "type": "object",
+  "required": ["checked_at", "screens_analyzed", "issues"],
+  "properties": {
+    "checked_at": { "type": "string", "format": "date-time" },
+    "screens_analyzed": {
+      "type": "array",
+      "items": { "type": "string" }
+    },
+    "issues": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "category", "severity", "description", "screens_affected", "evidence"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^consistency-[0-9]+$" },
+          "category": {
+            "type": "string",
+            "enum": ["terminology", "pattern", "component", "navigation", "typography", "density", "visual_false_friend"]
+          },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "description": { "type": "string" },
+          "screens_affected": {
+            "type": "array",
+            "items": { "type": "string" },
+            "minItems": 2
+          },
+          "evidence": { "type": "string" },
+          "recommendation": { "type": "string" }
+        }
+      }
+    },
+    "consistency_score": { "type": "integer", "minimum": 0, "maximum": 100 }
+  }
+}

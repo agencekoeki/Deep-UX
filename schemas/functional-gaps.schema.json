@@ -1,0 +1,32 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Functional Gaps",
+  "description": "Gaps fonctionnels identifiés en croisant capabilities, personas et résultats d'audit",
+  "type": "object",
+  "required": ["analyzed_at", "gaps"],
+  "properties": {
+    "analyzed_at": { "type": "string", "format": "date-time" },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "description", "persona_id", "capability_id", "priority", "recommendation"],
+        "properties": {
+          "id": { "type": "string", "pattern": "^gap-[0-9]+$" },
+          "type": {
+            "type": "string",
+            "enum": ["hidden_capability", "poor_exposure", "missing_shortcut", "workflow_gap", "accessibility_gap"]
+          },
+          "description": { "type": "string" },
+          "persona_id": { "type": "string" },
+          "capability_id": { "type": ["string", "null"] },
+          "screen_id": { "type": ["string", "null"] },
+          "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "recommendation": { "type": "string" },
+          "effort": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] }
+        }
+      }
+    },
+    "total_gaps": { "type": "integer", "minimum": 0 }
+  }
+}

@@ -1,0 +1,43 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Project Map",
+  "description": "Cartographie complète du projet cible produite par 02-discover.py",
+  "type": "object",
+  "required": ["scanned_at", "project_root", "stack", "files", "entry_points", "config_files", "dependencies_detected", "loc_by_type"],
+  "properties": {
+    "scanned_at": { "type": "string", "format": "date-time" },
+    "project_root": { "type": "string" },
+    "stack": {
+      "type": "object",
+      "required": ["type", "framework", "ui_library", "router"],
+      "properties": {
+        "type": { "type": "string", "enum": ["react", "vue", "angular", "php", "static", "unknown"] },
+        "framework": { "type": "string", "enum": ["next", "nuxt", "laravel", "wordpress", "none", "unknown"] },
+        "ui_library": { "type": "string", "enum": ["tailwind", "bootstrap", "mui", "antd", "none", "unknown"] },
+        "router": { "type": "string", "enum": ["react-router", "vue-router", "next", "none", "unknown"] }
+      }
+    },
+    "files": {
+      "type": "object",
+      "required": ["html", "css", "scss", "js", "jsx", "tsx", "vue", "php", "total_count"],
+      "properties": {
+        "html": { "type": "array", "items": { "type": "string" } },
+        "css": { "type": "array", "items": { "type": "string" } },
+        "scss": { "type": "array", "items": { "type": "string" } },
+        "js": { "type": "array", "items": { "type": "string" } },
+        "jsx": { "type": "array", "items": { "type": "string" } },
+        "tsx": { "type": "array", "items": { "type": "string" } },
+        "vue": { "type": "array", "items": { "type": "string" } },
+        "php": { "type": "array", "items": { "type": "string" } },
+        "total_count": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "entry_points": { "type": "array", "items": { "type": "string" } },
+    "config_files": { "type": "array", "items": { "type": "string" } },
+    "dependencies_detected": { "type": "array", "items": { "type": "string" } },
+    "loc_by_type": {
+      "type": "object",
+      "additionalProperties": { "type": "integer", "minimum": 0 }
+    }
+  }
+}
