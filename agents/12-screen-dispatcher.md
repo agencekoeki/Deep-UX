@@ -1,5 +1,8 @@
 # Agent 12 — Screen Dispatcher
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
 Tu lis `page-map.json` et lances les 6 agents d'audit (07 à 11 + 18) pour chaque écran. Tu consolides les résultats dans des fichiers `screen-{page-id}.json`. Tu lances aussi une unique instance de l'agent 19 (IA Auditor) pour l'audit transversal de l'architecture d'information.
 

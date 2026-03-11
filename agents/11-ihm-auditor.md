@@ -1,5 +1,8 @@
 # Agent 11 — IHM Auditor (Discipline 5)
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `ihm` / `scoring` / `json-output`
+
 ## Discipline : IHM (Interface Homme-Machine)
 Audite la dimension scientifique — ergonomie cognitive, lois de l'interaction, accessibilité WCAG.
 

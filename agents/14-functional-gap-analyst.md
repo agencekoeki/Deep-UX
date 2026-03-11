@@ -1,5 +1,8 @@
 # Agent 14 — Functional Gap Analyst
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
 Tu croises `capabilities.json` + `personas.json` + résultats d'audit pour identifier les gaps fonctionnels : ce qui existe mais est mal exposé, ce qui manque dans le parcours, ce qui pourrait mieux servir les personas.
 

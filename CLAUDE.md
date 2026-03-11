@@ -55,5 +55,31 @@ L'orchestrateur archive automatiquement chaque run terminé dans `.audit/archive
 ## Dossier quality-gates
 Créer `.audit/quality-gates/` dans le bootstrap.
 
+## Architecture des skills
+
+deep-ux utilise 10 skills qui structurent la connaissance du système.
+
+### Skills transversales (actives pour tous les agents)
+- `ux-audit` — définition des 6 disciplines, règle des 3 temps, règle d'ancrage
+- `anti-drift` — 7 règles de contrainte non négociables
+- `json-output` — conventions de format, nommage, écriture atomique
+
+### Skills disciplinaires (actives pour leur agent dédié)
+- `graphisme` → agent 07
+- `ui` → agent 08
+- `ux` → agent 09
+- `webdesign` → agent 10
+- `ihm` → agent 11
+- `wording` → agent 18
+
+### Skill de calibration
+- `scoring` — étalons de score par discipline
+
+### Relation skills / docs
+Les skills sont des distillations opérationnelles courtes.
+Les `docs/` sont les sources de référence longue forme.
+Les skills pointent vers les docs pour les définitions complètes.
+En cas de contradiction : la skill prévaut (plus récente et plus précise).
+
 ### En cas de doute
 Relis `SPEC.md`. Ne devine jamais.

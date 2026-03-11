@@ -4965,43 +4965,43 @@ En cas de contradiction : la skill prévaut (plus récente et plus précise).
 CC coche chaque item après création ou modification :
 
 ### Skills mises à jour
-- [ ] `skills/ux-audit/SKILL.md` (restructuration + table disciplines + skills spécialisées)
+- [x] `skills/ux-audit/SKILL.md` (restructuration + table disciplines + skills spécialisées)
 
 ### Nouvelles skills
-- [ ] `skills/anti-drift/SKILL.md`
-- [ ] `skills/scoring/SKILL.md`
-- [ ] `skills/json-output/SKILL.md`
-- [ ] `skills/graphisme/SKILL.md`
-- [ ] `skills/ui/SKILL.md`
-- [ ] `skills/ux/SKILL.md`
-- [ ] `skills/webdesign/SKILL.md`
-- [ ] `skills/ihm/SKILL.md`
-- [ ] `skills/wording/SKILL.md`
+- [x] `skills/anti-drift/SKILL.md`
+- [x] `skills/scoring/SKILL.md`
+- [x] `skills/json-output/SKILL.md`
+- [x] `skills/graphisme/SKILL.md`
+- [x] `skills/ui/SKILL.md`
+- [x] `skills/ux/SKILL.md`
+- [x] `skills/webdesign/SKILL.md`
+- [x] `skills/ihm/SKILL.md`
+- [x] `skills/wording/SKILL.md`
 
 ### Agents mis à jour (déclaration skills en en-tête)
-- [ ] `agents/00-orchestrator.md`
-- [ ] `agents/00b-quality-gate.md`
-- [ ] `agents/01-interview-conductor.md`
-- [ ] `agents/02-capability-mapper.md`
-- [ ] `agents/03-token-extractor-agent.md`
-- [ ] `agents/04-persona-builder.md`
-- [ ] `agents/05-brand-auditor.md`
-- [ ] `agents/06-benchmark-researcher.md`
-- [ ] `agents/07-graphisme-auditor.md`
-- [ ] `agents/08-ui-auditor.md`
-- [ ] `agents/09-ux-auditor.md`
-- [ ] `agents/10-webdesign-auditor.md`
-- [ ] `agents/11-ihm-auditor.md`
-- [ ] `agents/12-screen-dispatcher.md`
-- [ ] `agents/13-consistency-checker.md`
-- [ ] `agents/14-functional-gap-analyst.md`
-- [ ] `agents/15-report-generator.md`
-- [ ] `agents/16-coverage-auditor.md`
-- [ ] `agents/17-contradiction-detector.md`
-- [ ] `agents/18-wording-auditor.md`
-- [ ] `agents/19-ia-auditor.md`
-- [ ] `agents/20-contextual-gaps-auditor.md`
+- [x] `agents/00-orchestrator.md`
+- [x] `agents/00b-quality-gate.md`
+- [x] `agents/01-interview-conductor.md`
+- [x] `agents/02-capability-mapper.md`
+- [x] `agents/03-token-extractor-agent.md`
+- [x] `agents/04-persona-builder.md`
+- [x] `agents/05-brand-auditor.md`
+- [x] `agents/06-benchmark-researcher.md`
+- [x] `agents/07-graphisme-auditor.md`
+- [x] `agents/08-ui-auditor.md`
+- [x] `agents/09-ux-auditor.md`
+- [x] `agents/10-webdesign-auditor.md`
+- [x] `agents/11-ihm-auditor.md`
+- [x] `agents/12-screen-dispatcher.md`
+- [x] `agents/13-consistency-checker.md`
+- [x] `agents/14-functional-gap-analyst.md`
+- [x] `agents/15-report-generator.md`
+- [x] `agents/16-coverage-auditor.md`
+- [x] `agents/17-contradiction-detector.md`
+- [x] `agents/18-wording-auditor.md`
+- [x] `agents/19-ia-auditor.md`
+- [x] `agents/20-contextual-gaps-auditor.md`
 
 ### Fichiers de configuration
-- [ ] `.claude-plugin/plugin.json` (v0.5.0, 10 skills listées)
-- [ ] `CLAUDE.md` (section architecture des skills)
+- [x] `.claude-plugin/plugin.json` (v0.5.0, 10 skills listées)
+- [x] `CLAUDE.md` (section architecture des skills)

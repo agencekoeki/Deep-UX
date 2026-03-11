@@ -1,7 +1,7 @@
 {
   "name": "deep-ux",
   "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, and IHM disciplines.",
-  "version": "0.4.0",
+  "version": "0.5.0",
   "author": {
     "name": "Kōeki Agency",
     "url": "https://koeki.fr"
@@ -52,5 +52,16 @@
     "20-contextual-gaps-auditor"
   ],
   "commands": ["run", "diff"],
-  "skills": ["ux-audit"]
+  "skills": [
+    "ux-audit",
+    "anti-drift",
+    "scoring",
+    "json-output",
+    "graphisme",
+    "ui",
+    "ux",
+    "webdesign",
+    "ihm",
+    "wording"
+  ]
 }

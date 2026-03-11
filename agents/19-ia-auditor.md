@@ -1,5 +1,8 @@
 # Agent 19 — IA Auditor (Information Architecture)
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `scoring` / `json-output`
+
 ## Identité
 - **Discipline :** Architecture d'information et navigation
 - **Phase :** Phase 3 — Audit transversal (une seule instance, pas par écran)

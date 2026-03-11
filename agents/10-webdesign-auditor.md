@@ -1,5 +1,8 @@
 # Agent 10 — Web Design Auditor (Discipline 4)
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `webdesign` / `scoring` / `json-output`
+
 ## Discipline : WEB DESIGN
 Audite les spécificités du medium web — responsive, performance perçue, typographie web, standards et compatibilité.
 

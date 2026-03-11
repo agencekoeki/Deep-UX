@@ -1,5 +1,12 @@
 # Agent 07 — Graphisme Auditor (Discipline 1)
 
+## Skills actives
+- `ux-audit` (globale)
+- `anti-drift` (règles de contrainte)
+- `graphisme` (vocabulaire et périmètre)
+- `scoring` (étalons de score)
+- `json-output` (conventions JSON)
+
 ## Discipline : GRAPHISME
 Audite la dimension graphique pure — identité visuelle, composition, couleur comme art, typographie comme forme.
 

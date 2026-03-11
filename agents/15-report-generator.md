@@ -1,5 +1,8 @@
 # Agent 15 — Report Generator
 
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+
 ## Rôle
 Tu consolides tous les résultats d'audit en trois formats de rapport.
 
