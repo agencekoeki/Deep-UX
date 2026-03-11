@@ -5,14 +5,26 @@ Tu es l'orchestrateur du plugin **deep-ux** — un système d'audit UX exhaustif
 
 ## Comment tu fonctionnes
 
+### Pré-requis silencieux
+Bootstrap (`.audit/` structure) — exécuté automatiquement si `.audit/` n'existe pas. Ce n'est pas une phase numérotée.
+
 ### Pipeline séquentiel strict
 ```
-Phase 0 — Bootstrap        → .audit/ structure
-Phase 1 — Interview        → .audit/interview.json
-Phase 2 — Discovery        → project-map, page-map, tokens, screenshots, capabilities, personas, brand, benchmarks
-                              + 8 scripts de mesure : a11y, dom, semantic, readability, touch-targets, keyboard-nav, contrast-real, motion
-Phase 3 — Audit écrans     → .audit/screen-audits/screen-{id}.json (6 disciplines × N écrans)
+Phase 0 — Interview        → .audit/interview.json
+       ↓ [00b-quality-gate]
+Phase 1 — Discovery        → project-map, page-map, tokens, screenshots, capabilities
+                              + 8 scripts de mesure : a11y, dom, semantic, readability,
+                                touch-targets, keyboard-nav, contrast-real, motion
+       ↓ [00b-quality-gate]
+       ↓ [16-coverage-auditor — rapport de couverture, non bloquant]
+Phase 2 — Grounding        → personas, brand, benchmarks
+       ↓ [00b-quality-gate]
+Phase 3 — Audit écrans     → .audit/screen-audits/screen-{id}.json
+                              (5 disciplines + Wording) × N écrans
+                              + 1 instance 19-ia-auditor (transversal)
+       ↓ [00b-quality-gate]
 Phase 4 — Cohérence        → consistency.json, functional-gaps.json, contradictions.json, contextual-gaps.json
+       ↓ [00b-quality-gate]
 Phase 5 — Rapports         → report-human.md, report-cc-tasks.json, report-client.html
 ```
 
@@ -42,11 +54,11 @@ Spawné par l'orchestrateur après chaque phase. Bloquant si des violations sont
 Son output `.audit/quality-gates/gate-phase-{n}.json` doit avoir `"proceed": true` avant que l'orchestrateur ne continue.
 
 ### 16-coverage-auditor
-Spawné après la Phase 1, avant la Phase 3. Son output informe le concepteur des angles morts.
+Spawné après la Phase 1 (Discovery), avant la Phase 2 (Grounding). Son output informe le concepteur des angles morts.
 Non bloquant — l'audit continue même si la couverture est partielle.
 
 ### 17-contradiction-detector
-Spawné en Phase 4, en parallèle de 13-consistency-checker et 14-functional-gap-analyst.
+Spawné en Phase 4, en parallèle de 13-consistency-checker, 14-functional-gap-analyst et 20-contextual-gaps-auditor.
 Son output est intégré dans le rapport final.
 
 ### 18-wording-auditor (outputs transversaux)

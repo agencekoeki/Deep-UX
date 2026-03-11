@@ -39,7 +39,7 @@ Point deep-ux at any web project. It runs on its own. At the end, you get:
 | Screenshots | Manual | Playwright automatic, all pages |
 | Auth | Not supported | Form login + SSO session export |
 | Personas | No | Built from code + designer interview |
-| Cross-screen consistency | No | Dedicated Phase 4 agent |
+| Cross-screen consistency | No | 4 dedicated Phase 4 agents in parallel |
 | Functional recommendations | Invented | Anchored to capabilities.json |
 | Automated measurement | No | 8 scripts: axe-core a11y, DOM inventory, touch targets, contrast ratios, keyboard nav, readability, semantic structure, motion audit |
 | Structured knowledge | Implicit | 10 skills: anti-drift rules, scoring anchors, JSON conventions, 6 discipline vocabularies |
@@ -82,8 +82,12 @@ PHASE 2 — Grounding (automatic)
   Brand identity audit. Competitive benchmark.
 
 PHASE 3 — Screen-by-screen audit (automatic, parallel)
-  Each screen is analyzed independently by a dedicated agent.
-  Input: screenshot + source code + personas + capabilities.
+  Two types of analysis run in parallel:
+  — Per-screen agents (07 to 11 + 18-wording): one instance per screen,
+    covering 6 disciplines (Graphisme, UI, UX, Web Design, IHM, Wording).
+  — Transversal agent (19-ia-auditor): one single instance that reconstructs
+    the full navigation tree and measures task-to-access distance.
+  Input: screenshot + source code + measurement data + personas + capabilities.
 
 PHASE 4 — Cross-screen consistency (automatic, parallel)
   4 agents run in parallel: consistency checker, functional gap analyst,
@@ -93,6 +97,18 @@ PHASE 4 — Cross-screen consistency (automatic, parallel)
 PHASE 5 — Reports (automatic)
   Three formats: human-readable report, CC work tickets, client HTML report.
 ```
+
+### After the first run: `/deep-ux:diff`
+
+Once you have a completed audit, you can re-run `/deep-ux:run` after making changes. Each completed run is automatically archived in `.audit/archives/{timestamp}/`.
+
+Then use `/deep-ux:diff` to compare two runs:
+```
+/deep-ux:diff                    → compares current run with the previous one
+/deep-ux:diff --run=2024-01-15  → compares with a specific archived run
+```
+
+The diff report shows: improved scores, regressions, new screens, and which recommendations have been addressed.
 
 ---
 
@@ -136,6 +152,12 @@ Everything lands in `.audit/` (auto-gitignored):
 ├── motion/                      ← Animation & transition audit
 └── archives/                    ← Previous audit runs
 ```
+
+---
+
+## Estimating before running
+
+Before launching a full audit, set `DRY_RUN=true` in `.audit/.env`. The pipeline will estimate the number of pages, expected duration, and token cost — without running any agent. Useful for large projects where you want to verify scope before committing resources.
 
 ---
 
@@ -216,7 +238,7 @@ Vous pointez deep-ux sur n'importe quel projet web. Il tourne tout seul. À la f
 | Screenshots | Manuel | Playwright automatique, toutes pages |
 | Auth | Non supporté | Login classique + export session SSO |
 | Personas | Non | Construits à partir du code + interview |
-| Cohérence inter-écrans | Non | Agent dédié Phase 4 |
+| Cohérence inter-écrans | Non | 4 agents dédiés Phase 4 en parallèle |
 | Recommandations fonctionnelles | Inventées | Ancrées sur capabilities.json |
 | Mesure automatisée | Non | 8 scripts : a11y axe-core, inventaire DOM, cibles tactiles, ratios contraste, navigation clavier, lisibilité, structure sémantique, audit motion |
 | Connaissance structurée | Implicite | 10 skills : règles anti-drift, étalons de score, conventions JSON, 6 vocabulaires disciplinaires |
@@ -259,8 +281,12 @@ PHASE 2 — Grounding (automatique)
   Audit de l'identité de marque. Benchmark concurrentiel.
 
 PHASE 3 — Audit par écran (automatique, parallèle)
-  Chaque écran est analysé indépendamment par un agent dédié.
-  Input : screenshot + code source + personas + capabilities.
+  Deux types d'analyse tournent en parallèle :
+  — Agents par écran (07 à 11 + 18-wording) : une instance par écran,
+    couvrant 6 disciplines (Graphisme, UI, UX, Web Design, IHM, Wording).
+  — Agent transversal (19-ia-auditor) : une seule instance qui reconstruit
+    l'arbre de navigation complet et mesure la distance tâche/accès.
+  Input : screenshot + code source + données de mesure + personas + capabilities.
 
 PHASE 4 — Cohérence inter-écrans (automatique, parallèle)
   4 agents tournent en parallèle : cohérence, écarts fonctionnels,
@@ -270,6 +296,18 @@ PHASE 4 — Cohérence inter-écrans (automatique, parallèle)
 PHASE 5 — Rapports (automatique)
   Trois formats : rapport humain lisible, tickets CC, rapport client HTML.
 ```
+
+### Après le premier run : `/deep-ux:diff`
+
+Une fois un audit complet terminé, vous pouvez relancer `/deep-ux:run` après vos corrections. Chaque run terminé est archivé automatiquement dans `.audit/archives/{timestamp}/`.
+
+Puis utilisez `/deep-ux:diff` pour comparer deux runs :
+```
+/deep-ux:diff                    → compare le run actuel avec le précédent
+/deep-ux:diff --run=2024-01-15  → compare avec un run archivé à cette date
+```
+
+Le rapport de diff montre : scores améliorés, régressions, nouveaux écrans, et recommandations implémentées.
 
 ---
 
@@ -313,6 +351,12 @@ Tout est dans `.audit/` (gitignored automatiquement) :
 ├── motion/                      ← Audit animations et transitions
 └── archives/                    ← Runs d'audit précédents
 ```
+
+---
+
+## Estimer avant de lancer
+
+Avant de lancer un audit complet, mettez `DRY_RUN=true` dans `.audit/.env`. Le pipeline estimera le nombre de pages, la durée prévisible et le coût en tokens — sans lancer aucun agent. Utile pour les gros projets où vous voulez vérifier le périmètre avant d'engager des ressources.
 
 ---
 
