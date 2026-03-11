@@ -4079,3 +4079,929 @@ CC coche chaque item après création ou modification :
 
 ### Plugin manifest
 - [x] `.claude-plugin/plugin.json` (v0.4.0 avec scripts listés)
+
+
+
+# SPEC-v5.md — deep-ux — Additions v5
+## Addendum à SPEC.md, SPEC-v2.md, SPEC-v3.md et SPEC-v4.md
+
+**Lis ce fichier en entier avant de créer quoi que ce soit.**
+**Ce fichier COMPLÈTE les specs précédentes. Il ne les remplace pas.**
+**Après chaque fichier créé ou modifié, coche la case correspondante dans ## Progression.**
+**Ne passe jamais à l'étape suivante sans avoir fini la précédente.**
+
+---
+
+## Contexte de cette v5 — Pourquoi restructurer en skills
+
+La v1 a créé `skills/ux-audit/SKILL.md` — une skill globale fourre-tout.
+Les `docs/vocabulaire-*.md` et `docs/anti-drift-rules.md` jouent le rôle de skills *de facto*,
+mais leur chargement repose sur une instruction explicite dans chaque agent.
+Si un agent ne suit pas l'instruction, il perd son vocabulaire.
+
+**La distinction fondamentale :**
+
+| Mécanisme | Comment ça marche | Risque si ignoré |
+|---|---|---|
+| `docs/*.md` lu par un agent | Instruction explicite : "lis ce fichier avant de commencer" | L'agent peut l'ignorer ou l'oublier en contexte long |
+| `skills/*.md` déclarée dans `plugin.json` | Chargée automatiquement par CC quand le contexte correspond | Structurellement présente — pas de risque d'oubli |
+
+Les règles les plus critiques du système — anti-drift, vocabulaire disciplinaire, format JSON —
+doivent être des skills. Pas des docs.
+
+---
+
+## Ce que cette v5 fait
+
+1. Crée 9 skills dans `skills/` (une par discipline + anti-drift + scoring + json-output)
+2. Les `docs/` **restent en place** — ils deviennent les sources de référence longue forme
+3. Les skills sont des **distillations courtes et opérationnelles** de ces docs
+4. Chaque agent est mis à jour pour déclarer quelle(s) skill(s) il utilise
+5. `plugin.json` est mis à jour avec toutes les skills déclarées → v0.5.0
+
+---
+
+## Architecture cible des skills
+
+```
+skills/
+├── ux-audit/
+│   └── SKILL.md          (existant — skill globale d'entrée, à enrichir)
+├── anti-drift/
+│   └── SKILL.md          (nouveau — règles de contrainte transversales)
+├── scoring/
+│   └── SKILL.md          (nouveau — étalons de score par discipline)
+├── json-output/
+│   └── SKILL.md          (nouveau — conventions de format JSON)
+├── graphisme/
+│   └── SKILL.md          (nouveau — vocabulaire discipline 1)
+├── ui/
+│   └── SKILL.md          (nouveau — vocabulaire discipline 2)
+├── ux/
+│   └── SKILL.md          (nouveau — vocabulaire discipline 3)
+├── webdesign/
+│   └── SKILL.md          (nouveau — vocabulaire discipline 4)
+├── ihm/
+│   └── SKILL.md          (nouveau — vocabulaire discipline 5)
+└── wording/
+    └── SKILL.md          (nouveau — vocabulaire discipline 6)
+```
+
+**Principe de rédaction des skills :**
+- **Courte.** Une skill est lue en 30 secondes, pas en 5 minutes.
+- **Opérationnelle.** Elle dit quoi faire, pas pourquoi (le pourquoi est dans les `docs/`).
+- **Normative.** Elle utilise des formulations impératives : "Tu DOIS", "Tu NE DOIS PAS".
+- **Référentielle.** Elle pointe vers les `docs/` pour les détails : "Voir `docs/vocabulaire-graphisme.md` pour la définition complète."
+
+---
+
+## ÉTAPE 1 — Mettre à jour skills/ux-audit/SKILL.md
+
+**Action :** Remplacer le contenu existant par une version restructurée qui sert de **point d'entrée**
+et renvoie vers les skills spécialisées.
+
+```markdown
+# Skill — UX Audit (entrée globale)
+
+## Contexte d'activation
+Cette skill est active dès que Claude Code opère dans un projet deep-ux.
+Elle s'applique à TOUS les agents sans exception.
+
+## Ce que tu es
+
+Tu es un auditeur UX/UI multi-disciplinaire. Tu ne travailles jamais à l'intuition.
+Tu décris avant d'évaluer. Tu évalues avant de recommander.
+
+## Les 6 disciplines — périmètres stricts
+
+| Discipline | Ce qu'elle couvre | Ce qu'elle NE couvre PAS |
+|---|---|---|
+| Graphisme | Composition, couleur comme art, typographie comme graphisme | Fonctionnement des composants |
+| UI | Composants, états interactifs, design tokens, cohérence système | Parcours utilisateur |
+| UX | Parcours, charge cognitive, architecture d'information | Accessibilité technique |
+| Web Design | Responsive, performance perçue, standards web | Identité de marque |
+| IHM | Lois ergonomiques, heuristiques Nielsen, WCAG | Style graphique |
+| Wording | Labels, CTAs, messages d'état, registre, terminologie | Contenu éditorial long |
+
+## La règle des 3 temps — sans exception
+
+1. **DÉCRIRE** : "Je vois [description factuelle de ce qui est là]"
+2. **ÉVALUER** : "Par rapport à [critère], ceci est [observation précise et chiffrée]"
+3. **RECOMMANDER** : "Il faudrait [action concrète et actionnable]"
+
+Ne jamais passer au temps 2 sans avoir complété le temps 1.
+Ne jamais passer au temps 3 sans avoir complété le temps 2.
+
+## La règle d'ancrage
+
+Toute observation cite sa source.
+- Fichier de mesure : `[a11y-page-001.json: violations.critical=2]`
+- Screenshot : `[screenshot page-001.png — zone header droite]`
+- Code source : `[Dashboard.tsx:142 — classe .btn-primary]`
+- Fichier JSON produit par phase précédente : `[personas.json:persona-001.goals[2]]`
+
+## Les skills spécialisées
+
+Chaque agent d'audit disciplinaire charge SA skill en plus de celle-ci :
+- Agent 07 → skill `graphisme`
+- Agent 08 → skill `ui`
+- Agent 09 → skill `ux`
+- Agent 10 → skill `webdesign`
+- Agent 11 → skill `ihm`
+- Agent 18 → skill `wording`
+- Tous les agents → skill `anti-drift` + skill `json-output`
+
+## Référence complète
+
+Pour les définitions longues, les frameworks de référence, et les pièges à éviter :
+→ `docs/vocabulaire-*.md` (une par discipline)
+→ `docs/grille-evaluation.md`
+→ `docs/anti-drift-rules.md`
+```
+
+---
+
+## ÉTAPE 2 — Créer skills/anti-drift/SKILL.md
+
+```markdown
+# Skill — Anti-Drift
+
+## Contexte d'activation
+Cette skill est active pour TOUS les agents de deep-ux sans exception.
+Elle définit les contraintes de qualité non négociables.
+
+## Les 7 règles — toutes obligatoires
+
+**Règle 1 — Décrire avant d'évaluer**
+Commencer toute analyse par une description factuelle de ce qui est observé.
+Format : "Je vois : [description]"
+Interdit : commencer par une évaluation sans description préalable.
+
+**Règle 2 — Citer la source**
+Toute observation cite le fichier, le sélecteur, ou la position exacte dont elle provient.
+Acceptable : `[dom-page-001.json:elem-042 — bouton .btn-delete 28×18px]`
+Interdit : "Le bouton de suppression est trop petit" sans référence.
+
+**Règle 3 — Interdiction des généralités**
+Ces formulations sont INTERDITES dans tout champ `observation` ou `recommendation` :
+- "pourrait être amélioré"
+- "manque de clarté"
+- "n'est pas optimal"
+- "devrait être plus [adjectif]"
+- "gagnerait à être [verbe]"
+- "il serait bien de"
+
+Toute observation doit être spécifique, chiffrée quand possible, et non-paraphrasable.
+
+**Règle 4 — Ancrage fonctionnel**
+Toute recommandation fonctionnelle doit soit :
+- Référencer un `capability_id` dans `capabilities.json`
+- Être taguée `"speculation": true` avec explication
+
+Interdit : recommander une fonctionnalité sans preuve qu'elle existe dans le code.
+
+**Règle 5 — Schema strict**
+Tout JSON produit est conforme au schema correspondant dans `schemas/`.
+Tout champ obligatoire du schema est renseigné — jamais `null` sans raison documentée.
+
+**Règle 6 — Reprendre, pas recréer**
+Si un fichier output existe déjà, le lire et le compléter.
+Ne jamais écraser un output existant sans vérification.
+
+**Règle 7 — Vocabulaire disciplinaire**
+Chaque agent utilise le vocabulaire de SA discipline.
+Un agent graphisme n'utilise pas le vocabulaire IHM.
+Un agent UX n'utilise pas le vocabulaire graphisme.
+En cas de doute : charger la skill de la discipline concernée.
+
+## Détection automatique de violation
+
+Le `00b-quality-gate` scanne ces patterns interdits dans tous les JSON produits.
+Une violation détectée bloque la progression vers la phase suivante.
+→ Voir `docs/anti-drift-rules.md` pour la liste complète des patterns interdits.
+```
+
+---
+
+## ÉTAPE 3 — Créer skills/scoring/SKILL.md
+
+```markdown
+# Skill — Scoring
+
+## Contexte d'activation
+Cette skill est active pour tous les agents qui produisent un score numérique.
+
+## Principe fondamental
+
+Un score n'est pas une note de satisfaction. C'est une mesure de distance
+entre l'interface auditée et un étalon professionnel défini.
+
+## Étalons par discipline
+
+### Graphisme (score /100)
+- **90-100** : Référence professionnelle (Stripe, Linear, Notion)
+- **70-89** : Compétent — grille tenue, palette cohérente, typographie correcte
+- **50-69** : Problèmes significatifs visibles à l'œil nu
+- **30-49** : Problèmes majeurs — pas de grille, palette chaotique
+- **0-29** : Non fonctionnel graphiquement
+
+### UI (score /100)
+- **90-100** : Design system cohérent, tous les états définis, densité maîtrisée
+- **70-89** : Cohérence majoritaire, quelques accidents de composants
+- **50-69** : Incohérences notables entre composants similaires
+- **30-49** : Pas de système — chaque composant est un cas isolé
+- **0-29** : Interface visuellement chaotique au niveau des composants
+
+### UX (score /100)
+- **90-100** : Toutes les tâches personas en ≤2 clics, charge cognitive maîtrisée
+- **70-89** : Majorité des tâches accessibles, quelques frictions identifiées
+- **50-69** : Plusieurs frictions sur les tâches fréquentes, architecture confuse
+- **30-49** : Les tâches principales sont difficiles à accomplir
+- **0-29** : L'interface ne permet pas d'accomplir les tâches des personas
+
+### Web Design (score /100)
+- **90-100** : Responsive parfait, touch targets conformes, motion maîtrisée
+- **70-89** : Responsive fonctionnel, quelques touch targets sous le seuil
+- **50-69** : Des breakpoints manquants, >20% des touch targets sous 44px
+- **30-49** : Mobile non traité ou dégradé, performance perçue faible
+- **0-29** : Pas de traitement responsive, interface inutilisable sur mobile
+
+### IHM (scores /10 par heuristique Nielsen, score global /100)
+- **9-10** : Heuristique parfaitement respectée, aucune violation
+- **7-8** : Respectée avec quelques exceptions mineures documentées
+- **5-6** : Violations notables sur 1-2 cas d'usage fréquents
+- **3-4** : Violations systématiques sur cette heuristique
+- **0-2** : Heuristique ignorée ou violée structurellement
+
+### Wording (score /100)
+- **90-100** : Terminologie cohérente, CTAs verbaux, tous les états ont un wording
+- **70-89** : Quelques incohérences terminologiques, registre globalement cohérent
+- **50-69** : Incohérences cross-vues, plusieurs CTAs génériques, empty states muets
+- **30-49** : Terminologie chaotique, codes d'erreur techniques exposés
+- **0-29** : Wording absent ou issu du développement (textes de placeholder non remplacés)
+
+### Architecture d'information (score /100, agent 19)
+Voir `agents/19-ia-auditor.md` pour les ancres détaillées par sous-score.
+
+## Règle de calibration — universelle
+
+**En cas de doute entre deux tranches : choisir la plus basse.**
+Justifier pourquoi l'interface ne mérite pas la tranche supérieure.
+Un score généreux non justifié est détecté par le quality-gate comme dérive complaisante.
+
+## Règle de dérive
+
+Si le quality-gate détecte que >80% des scores d'un run sont au-dessus de 75 :
+→ Alerte dérive complaisante émise
+→ L'agent doit re-justifier ses scores les plus élevés
+
+## Ce qu'un score N'EST PAS
+
+Un score n'est pas :
+- Une moyenne automatique de critères
+- Un reflet de l'effort de l'équipe de développement
+- Une note sur l'intention — seulement sur le résultat observable
+```
+
+---
+
+## ÉTAPE 4 — Créer skills/json-output/SKILL.md
+
+```markdown
+# Skill — JSON Output
+
+## Contexte d'activation
+Cette skill est active pour tout agent qui produit un fichier JSON.
+
+## Conventions de nommage
+
+### Identifiants
+- Pages : `page-001`, `page-002` (zéro-padded sur 3 digits)
+- Éléments DOM : `elem-001`, `elem-002`
+- Recommandations : `rec-001`, `rec-002`
+- Observations : `obs-001`, `obs-002`
+- Contradictions : `contradiction-001`
+- Gaps contextuels : `cgap-001`
+- Capabilities : `cap-001`
+- Personas : `persona-001`
+
+### Timestamps
+Format ISO 8601 avec Z : `"2025-03-11T14:32:00Z"`
+Jamais de timestamp localisé sans timezone.
+
+### Chemins de fichiers
+Toujours relatifs à la racine du projet cible.
+Exemple : `.audit/screenshots/page-001.png` — pas `/home/user/project/.audit/...`
+
+## Conventions de contenu
+
+### Champ `observation`
+- Commence toujours par un fait observable (jamais par une évaluation)
+- Contient une référence source entre crochets
+- Est spécifique et non-paraphrasable
+- Longueur : 1-3 phrases maximum
+
+**Exemple correct :**
+`"Le bouton 'Valider' du formulaire de contact mesure 28×18px en mobile [touch-page-003.json:target-012]. Le seuil minimum iOS/Google est 44×44px."`
+
+**Exemple interdit :**
+`"Le bouton est trop petit pour les utilisateurs mobiles."`
+
+### Champ `recommendation`
+- Commence toujours par un verbe à l'infinitif
+- Décrit l'action à réaliser, pas l'état cible
+- Contient une référence capability_id ou `"speculation": true`
+
+**Exemple correct :**
+`"Augmenter la zone de tap du bouton 'Valider' à minimum 44×44px en ajoutant du padding (min 8px vertical) — modifiable dans le composant Button.tsx"`
+
+**Exemple interdit :**
+`"Le bouton devrait être plus grand pour être accessible sur mobile."`
+
+### Champ `severity` / `priority`
+Valeurs strictes : `"critical"`, `"high"`, `"medium"`, `"low"`
+Pas de valeurs libres ("urgent", "important", "minor").
+
+### Champ `effort`
+Valeurs strictes : `"xs"`, `"s"`, `"m"`, `"l"`, `"xl"`
+Définitions :
+- `xs` : ≤30 minutes — changement CSS/texte localisé
+- `s` : ≤2 heures — modification d'un composant
+- `m` : ≤1 jour — refonte d'une section
+- `l` : ≤1 semaine — refonte d'un écran ou d'un système
+- `xl` : >1 semaine — refonte architecturale
+
+## Règles d'écriture atomique
+
+Tout fichier JSON est écrit de façon atomique :
+1. Écrire dans un fichier temporaire `{nom}.tmp`
+2. Faire un `os.replace()` pour remplacer l'existant
+3. Ne jamais écrire directement sur le fichier cible
+
+Ceci est implémenté dans `lib/file_utils.py:write_json()`.
+Les agents ne gèrent pas l'écriture directement — ils passent par `write_json()`.
+
+## Validation schema
+
+Avant de finaliser tout output JSON, vérifier la conformité au schema :
+```python
+import jsonschema
+schema = read_json(f"schemas/{schema_name}.schema.json")
+jsonschema.validate(instance=output, schema=schema)
+```
+Si la validation échoue : logger l'erreur, ne pas écrire le fichier, signaler dans `script-errors.json`.
+```
+
+---
+
+## ÉTAPE 5 — Créer skills/graphisme/SKILL.md
+
+```markdown
+# Skill — Graphisme
+
+## Contexte d'activation
+Cette skill est active pour l'agent `07-graphisme-auditor` uniquement.
+
+## Périmètre strict
+
+Le graphisme audite :
+- La composition et la mise en page (grille, rapport plein/vide, axes de lecture)
+- La couleur comme outil graphique (teintes, valeurs tonales, harmonie)
+- La typographie comme graphisme (personnalité, contraste de graisse, hiérarchie visuelle)
+- L'identité et la cohérence de style sur cet écran
+
+Le graphisme N'audite PAS :
+- Le fonctionnement des composants (→ UI)
+- La lisibilité du texte au sens WCAG (→ IHM)
+- L'expérience de navigation (→ UX)
+
+## Vocabulaire obligatoire — utiliser ces termes
+
+**Composition :** grille, rapport plein/vide, focal point, axe de lecture, Z-pattern, F-pattern,
+hiérarchie visuelle, tension, rythme visuel, respiration, alignement, proximité (Gestalt),
+figure/fond, densité
+
+**Couleur :** teinte, saturation, luminosité, valeur tonale, contraste simultané, température,
+harmonie (analogique, complémentaire, triadique), accident chromatique, palette
+
+**Typographie :** kerning, leading, tracking, weight (graisse), humaniste, géométrique,
+mécane/slab, transitional, corps, interlignage, approche, casse, empattement, sans-serif
+
+**Style :** flat design, neumorphisme, glassmorphisme, skeuomorphisme, minimalisme,
+cohérence de style, identité visuelle
+
+## Ce que tu NE dois pas dire
+
+Interdit : "la typographie est lisible" (→ c'est IHM, pas graphisme)
+Interdit : "les couleurs sont accessibles" (→ c'est IHM/WCAG)
+Interdit : "l'interface est intuitive" (→ c'est UX)
+Interdit : tout adjectif non défini ("beau", "moderne", "propre")
+
+## Référence complète
+
+→ `docs/vocabulaire-graphisme.md`
+```
+
+---
+
+## ÉTAPE 6 — Créer skills/ui/SKILL.md
+
+```markdown
+# Skill — UI (User Interface Design)
+
+## Contexte d'activation
+Cette skill est active pour l'agent `08-ui-auditor` uniquement.
+
+## Périmètre strict
+
+L'UI audite :
+- Le système de composants et sa cohérence interne
+- Les états interactifs (hover, focus, active, disabled, loading, error, success)
+- La grille d'espacement et les design tokens
+- La densité d'information et son adéquation au contexte
+
+L'UI N'audite PAS :
+- L'esthétique graphique (→ Graphisme)
+- Les parcours utilisateur (→ UX)
+- La conformité WCAG (→ IHM)
+
+## Vocabulaire obligatoire
+
+**Système :** design system, token, composant, variant, instance, atomic design,
+cohérence, pattern, librairie de composants
+
+**États :** affordance, état (state), hover, focus, active, disabled, loading state,
+error state, success state, skeleton screen, spinner, empty state
+
+**Espacement :** grille, baseline grid, padding, margin, gap, gutter,
+échelle d'espacement, 4px grid, 8px grid
+
+**Densité :** densité d'information, information density, data density, scannable
+
+## Ce que tu NE dois pas dire
+
+Interdit : "le composant n'est pas beau" (→ Graphisme)
+Interdit : "l'utilisateur ne comprend pas" (→ UX ou IHM)
+Interdit : "le contraste est insuffisant" sans chiffre (→ donne le ratio, ou réfère à IHM)
+
+## Référence complète
+
+→ `docs/vocabulaire-ui.md`
+```
+
+---
+
+## ÉTAPE 7 — Créer skills/ux/SKILL.md
+
+```markdown
+# Skill — UX (User Experience)
+
+## Contexte d'activation
+Cette skill est active pour l'agent `09-ux-auditor` uniquement.
+
+## Périmètre strict
+
+L'UX audite :
+- L'architecture de l'information et sa correspondance avec les modèles mentaux des personas
+- La charge cognitive (Miller, Hick)
+- Les parcours et flows (tâches, sous-tâches, frictions, dead ends)
+- Le feedback et le signalement de l'état du système
+
+L'UX N'audite PAS :
+- L'esthétique (→ Graphisme)
+- Les composants et leurs états (→ UI)
+- Les lois ergonomiques scientifiques (→ IHM, qui fait Fitts, Nielsen, Norman)
+
+**Distinction UX / IHM :**
+L'UX parle de parcours et de sens. L'IHM parle de lois et de mesures.
+"L'utilisateur ne trouve pas l'action principale" = UX.
+"La cible cliquable fait 18px et viole Fitts" = IHM.
+
+## Vocabulaire obligatoire
+
+**Parcours :** parcours utilisateur, tâche, sous-tâche, friction, dead end,
+progressive disclosure, onboarding, off-boarding, error recovery
+
+**Cognition :** modèle mental, charge cognitive, architecture de l'information,
+reconnaissance vs rappel, contexte, attention, mémoire de travail
+
+**Feedback :** feedback, signifiant, affordance (usage UX), état du système,
+indicateur de progression, confirmation, message d'erreur
+
+**Organisation :** catégorisation, navigation, breadcrumb, menu, label,
+regroupement, priorité, hiérarchie
+
+## Ce que tu NE dois pas dire
+
+Interdit : "le bouton est mal placé selon Fitts" (→ IHM)
+Interdit : "la couleur ne correspond pas à la charte" (→ Graphisme)
+Interdit : "l'espacement est incohérent" (→ UI)
+
+## Référence complète
+
+→ `docs/vocabulaire-ux.md`
+```
+
+---
+
+## ÉTAPE 8 — Créer skills/webdesign/SKILL.md
+
+```markdown
+# Skill — Web Design
+
+## Contexte d'activation
+Cette skill est active pour l'agent `10-webdesign-auditor` uniquement.
+
+## Périmètre strict
+
+Le Web Design audite :
+- Le responsive et l'adaptabilité multi-viewport
+- Les touch targets et l'ergonomie tactile
+- La performance perçue (lazy loading, skeletons, animations)
+- Les standards web spécifiques au medium (HTML sémantique, font-loading, above the fold)
+
+Le Web Design N'audite PAS :
+- L'esthétique (→ Graphisme)
+- La conformité WCAG technique (→ IHM — sauf touch targets qui sont partagés)
+- Les parcours utilisateur (→ UX)
+
+## Vocabulaire obligatoire
+
+**Responsive :** breakpoint, viewport, media query, fluid layout, mobile-first,
+container query, touch target, tap target, 44px minimum
+
+**Performance perçue :** lazy loading, skeleton screen, spinner, above the fold,
+scroll depth, perceived performance, time to interactive, CLS (Cumulative Layout Shift)
+
+**Standards web :** font-display, subset, system font stack, progressive enhancement,
+graceful degradation, HTML sémantique, alt text, lang attribute
+
+**Motion :** transition, animation, prefers-reduced-motion, duration, easing,
+300ms threshold, infinite animation
+
+## Données de mesure disponibles
+
+Si les fichiers suivants existent, citer leurs données :
+- `touch-targets/touch-{page-id}.json` → taille réelle des targets en mobile
+- `motion/motion-audit.json` → durées et couverture prefers-reduced-motion
+
+Format : `[touch-{page-id}.json: 17 targets sous 44px (40%)]`
+
+## Ce que tu NE dois pas dire
+
+Interdit : "le design est moderne" (→ Graphisme)
+Interdit : "l'utilisateur est perdu" (→ UX)
+Interdit : "le contraste est insuffisant" (→ IHM)
+
+## Référence complète
+
+→ `docs/vocabulaire-webdesign.md`
+```
+
+---
+
+## ÉTAPE 9 — Créer skills/ihm/SKILL.md
+
+```markdown
+# Skill — IHM (Interface Homme-Machine)
+
+## Contexte d'activation
+Cette skill est active pour l'agent `11-ihm-auditor` uniquement.
+
+## Périmètre strict
+
+L'IHM audite :
+- Les lois ergonomiques (Fitts, Hick-Hyman, Miller)
+- Les 10 heuristiques de Nielsen
+- Les principes de Don Norman (affordances, signifiants, modèle conceptuel, feedback, contraintes)
+- La conformité WCAG 2.1 (A, AA, AAA)
+- La navigation clavier et les technologies d'assistance
+
+## Les 10 heuristiques de Nielsen — rappel opérationnel
+
+1. **Visibilité de l'état** — L'utilisateur sait toujours où il en est
+2. **Correspondance réel/système** — Le système parle le langage de l'utilisateur
+3. **Contrôle et liberté** — L'utilisateur peut toujours annuler ou revenir
+4. **Cohérence et standards** — Les conventions sont respectées
+5. **Prévention des erreurs** — Les erreurs sont impossibles à commettre
+6. **Reconnaissance > rappel** — Les options sont visibles, pas mémorisées
+7. **Flexibilité et efficacité** — Les experts peuvent accélérer
+8. **Design minimaliste** — Pas d'information superflue
+9. **Aide à la récupération d'erreurs** — Erreurs diagnostiquées + solutions proposées
+10. **Aide et documentation** — L'aide est disponible si nécessaire
+
+## Les principes de Norman — rappel opérationnel
+
+- **Affordance** : la forme suggère l'usage possible
+- **Signifiant** : le signal visuel indique où agir
+- **Contrainte** : les erreurs impossibles sont rendues impossibles
+- **Feedback** : chaque action déclenche un retour perceptible
+- **Modèle conceptuel** : l'interface correspond à ce que l'utilisateur attend
+
+## Vocabulaire obligatoire
+
+affordance, signifiant, contrainte, feedback, modèle conceptuel, heuristique,
+charge cognitive, mémoire de travail, chunk, loi de Fitts, loi de Hick, loi de Miller,
+WCAG, ARIA, focus management, skip link, lecteur d'écran, navigation clavier,
+ratio de contraste, alt text, label de formulaire
+
+## Données de mesure disponibles — PRIORITÉ
+
+Si les fichiers suivants existent, ils ont la priorité sur les inférences depuis screenshot :
+- `a11y/a11y-{page-id}.json` → violations WCAG réelles (axe-core)
+- `semantic/semantic-{page-id}.json` → headings, landmarks, images sans alt
+- `keyboard-nav/keyboard-{page-id}.json` → focus, traps, ordre de tab
+- `contrast-real/contrast-{page-id}.json` → ratios réels
+
+Format de citation obligatoire : `[a11y-{page-id}.json: color-contrast ×3, critical]`
+
+## Ce que tu NE dois pas dire
+
+Interdit : "la couleur n'est pas harmonieuse" (→ Graphisme)
+Interdit : "l'espacement est incohérent" (→ UI)
+Interdit : "le parcours est confus" sans référencer une loi ou heuristique spécifique
+
+## Référence complète
+
+→ `docs/vocabulaire-ihm.md`
+```
+
+---
+
+## ÉTAPE 10 — Créer skills/wording/SKILL.md
+
+```markdown
+# Skill — Wording
+
+## Contexte d'activation
+Cette skill est active pour l'agent `18-wording-auditor` uniquement.
+
+## Périmètre strict
+
+Le Wording audite :
+- Les labels de navigation, boutons, formulaires
+- Les messages d'état (erreur, succès, vide, chargement)
+- La cohérence terminologique cross-vues
+- L'adéquation du registre aux personas
+- Les placeholders et tooltips
+
+Le Wording N'audite PAS :
+- Le contenu éditorial long (articles, descriptions, pages "À propos")
+- Les données dynamiques (noms, montants, dates)
+- La documentation in-app
+
+## Règle des 3 points pour les messages d'erreur (Nielsen)
+
+Tout message d'erreur doit satisfaire :
+1. CE QUI s'est passé
+2. POURQUOI
+3. COMMENT corriger
+
+Un message qui ne satisfait pas les 3 est une violation. Préciser combien de points manquent.
+
+## Règle des CTAs
+
+Un CTA correct :
+- Commence par un verbe à l'infinitif (Enregistrer, Créer, Supprimer, Exporter)
+- Décrit l'action réelle (pas "OK", "Continuer", "Oui" sans contexte)
+- Pour les actions destructives : nomme explicitement ce qui sera détruit
+
+## Règle des empty states
+
+Un empty state correct contient :
+1. Pourquoi c'est vide
+2. Une action pour remédier (si applicable)
+
+"Aucune donnée" seul = violation haute.
+
+## Vocabulaire obligatoire
+
+microcopy, label, placeholder, empty state, CTA (call to action), error message,
+affordance verbale, registre, cohérence terminologique, voix de l'application,
+charge textuelle, jargon développeur
+
+## Données de mesure disponibles
+
+Si `readability/readability-{page-id}.json` existe :
+- Utiliser `dominant_reading_level` comme donnée objective
+- Utiliser `ctas_starting_with_verb` pour scorer la qualité des CTAs
+- Format : `[readability-{page-id}.json: niveau=difficile, Flesch=31]`
+
+## Ce que tu NE dois pas dire
+
+Interdit : réécrire le wording toi-même dans une observation (observer et recommander le principe, ne pas rédiger à la place)
+Interdit : évaluer le contenu long (articles, docs)
+Interdit : signaler comme problème un terme technique correct pour un persona expert
+
+## Référence complète
+
+→ `docs/vocabulaire-wording.md`
+```
+
+---
+
+## ÉTAPE 11 — Mettre à jour chaque agent pour déclarer ses skills
+
+**Action :** Ajouter en **en-tête** de chaque agent (avant tout autre contenu) un bloc de déclaration :
+
+**Pour 07-graphisme-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` (globale)
+- `anti-drift` (règles de contrainte)
+- `graphisme` (vocabulaire et périmètre)
+- `scoring` (étalons de score)
+- `json-output` (conventions JSON)
+```
+
+**Pour 08-ui-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `ui` / `scoring` / `json-output`
+```
+
+**Pour 09-ux-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `ux` / `scoring` / `json-output`
+```
+
+**Pour 10-webdesign-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `webdesign` / `scoring` / `json-output`
+```
+
+**Pour 11-ihm-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `ihm` / `scoring` / `json-output`
+```
+
+**Pour 18-wording-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `wording` / `scoring` / `json-output`
+```
+
+**Pour 19-ia-auditor.md :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `scoring` / `json-output`
+```
+
+**Pour 00-orchestrator.md, 00b-quality-gate.md, et tous les autres agents :**
+```markdown
+## Skills actives
+- `ux-audit` / `anti-drift` / `json-output`
+```
+
+---
+
+## ÉTAPE 12 — Mettre à jour .claude-plugin/plugin.json → v0.5.0
+
+**Action :** Mettre à jour la section `skills` avec toutes les skills :
+
+```json
+{
+  "name": "deep-ux",
+  "version": "0.5.0",
+  "skills": [
+    "ux-audit",
+    "anti-drift",
+    "scoring",
+    "json-output",
+    "graphisme",
+    "ui",
+    "ux",
+    "webdesign",
+    "ihm",
+    "wording"
+  ],
+  "agents": [
+    "00-orchestrator",
+    "00b-quality-gate",
+    "01-interview-conductor",
+    "02-capability-mapper",
+    "03-token-extractor-agent",
+    "04-persona-builder",
+    "05-brand-auditor",
+    "06-benchmark-researcher",
+    "07-graphisme-auditor",
+    "08-ui-auditor",
+    "09-ux-auditor",
+    "10-webdesign-auditor",
+    "11-ihm-auditor",
+    "12-screen-dispatcher",
+    "13-consistency-checker",
+    "14-functional-gap-analyst",
+    "15-report-generator",
+    "16-coverage-auditor",
+    "17-contradiction-detector",
+    "18-wording-auditor",
+    "19-ia-auditor",
+    "20-contextual-gaps-auditor"
+  ],
+  "scripts": [
+    "00-bootstrap.sh",
+    "01-check-deps.sh",
+    "02-discover.py",
+    "03-build-page-map.py",
+    "04-screenshot.py",
+    "05-extract-tokens.py",
+    "06-export-session-helper.py",
+    "00b-estimate-run.py",
+    "07-a11y-scan.py",
+    "08-dom-inventory.py",
+    "09-semantic-structure.py",
+    "10-readability.py",
+    "11-touch-targets.py",
+    "12-nav-keyboard.py",
+    "13-contrast-real.py",
+    "14-motion-audit.py"
+  ],
+  "commands": ["run", "diff"]
+}
+```
+
+---
+
+## ÉTAPE 13 — Mettre à jour CLAUDE.md
+
+**Action :** Ajouter une section "Architecture des skills" :
+
+```markdown
+## Architecture des skills
+
+deep-ux utilise 10 skills qui structurent la connaissance du système.
+
+### Skills transversales (actives pour tous les agents)
+- `ux-audit` — définition des 6 disciplines, règle des 3 temps, règle d'ancrage
+- `anti-drift` — 7 règles de contrainte non négociables
+- `json-output` — conventions de format, nommage, écriture atomique
+
+### Skills disciplinaires (actives pour leur agent dédié)
+- `graphisme` → agent 07
+- `ui` → agent 08
+- `ux` → agent 09
+- `webdesign` → agent 10
+- `ihm` → agent 11
+- `wording` → agent 18
+
+### Skill de calibration
+- `scoring` — étalons de score par discipline
+
+### Relation skills / docs
+Les skills sont des distillations opérationnelles courtes.
+Les `docs/` sont les sources de référence longue forme.
+Les skills pointent vers les docs pour les définitions complètes.
+En cas de contradiction : la skill prévaut (plus récente et plus précise).
+```
+
+---
+
+## 9. Progression v5
+
+CC coche chaque item après création ou modification :
+
+### Skills mises à jour
+- [ ] `skills/ux-audit/SKILL.md` (restructuration + table disciplines + skills spécialisées)
+
+### Nouvelles skills
+- [ ] `skills/anti-drift/SKILL.md`
+- [ ] `skills/scoring/SKILL.md`
+- [ ] `skills/json-output/SKILL.md`
+- [ ] `skills/graphisme/SKILL.md`
+- [ ] `skills/ui/SKILL.md`
+- [ ] `skills/ux/SKILL.md`
+- [ ] `skills/webdesign/SKILL.md`
+- [ ] `skills/ihm/SKILL.md`
+- [ ] `skills/wording/SKILL.md`
+
+### Agents mis à jour (déclaration skills en en-tête)
+- [ ] `agents/00-orchestrator.md`
+- [ ] `agents/00b-quality-gate.md`
+- [ ] `agents/01-interview-conductor.md`
+- [ ] `agents/02-capability-mapper.md`
+- [ ] `agents/03-token-extractor-agent.md`
+- [ ] `agents/04-persona-builder.md`
+- [ ] `agents/05-brand-auditor.md`
+- [ ] `agents/06-benchmark-researcher.md`
+- [ ] `agents/07-graphisme-auditor.md`
+- [ ] `agents/08-ui-auditor.md`
+- [ ] `agents/09-ux-auditor.md`
+- [ ] `agents/10-webdesign-auditor.md`
+- [ ] `agents/11-ihm-auditor.md`
+- [ ] `agents/12-screen-dispatcher.md`
+- [ ] `agents/13-consistency-checker.md`
+- [ ] `agents/14-functional-gap-analyst.md`
+- [ ] `agents/15-report-generator.md`
+- [ ] `agents/16-coverage-auditor.md`
+- [ ] `agents/17-contradiction-detector.md`
+- [ ] `agents/18-wording-auditor.md`
+- [ ] `agents/19-ia-auditor.md`
+- [ ] `agents/20-contextual-gaps-auditor.md`
+
+### Fichiers de configuration
+- [ ] `.claude-plugin/plugin.json` (v0.5.0, 10 skills listées)
+- [ ] `CLAUDE.md` (section architecture des skills)
