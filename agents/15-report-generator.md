@@ -16,6 +16,8 @@ Tous les fichiers `.audit/` :
 - `.audit/screen-audits/screen-*.json`
 - `.audit/phase4/consistency.json`
 - `.audit/phase4/functional-gaps.json`
+- `.audit/phase4/contradictions.json` (si existant)
+- `.audit/coverage-report.json` (si existant)
 
 ## Outputs
 1. `.audit/reports/report-human.md` — rapport narratif
@@ -32,6 +34,13 @@ Tous les fichiers `.audit/` :
 
 ## Résumé exécutif
 [5 lignes max — l'essentiel pour un décideur pressé]
+
+## 10 actions à mener en priorité
+Ces 10 actions représentent le meilleur ratio impact/effort identifié dans cet audit.
+Elles seules pourraient améliorer significativement l'expérience utilisateur.
+
+1. [action] — [discipline] — Effort : XS — Impact : Critical
+2. ...
 
 ## Scores par discipline
 | Discipline | Score moyen | Min | Max |
@@ -77,6 +86,25 @@ Tous les fichiers `.audit/` :
 [Recommandations à impact élevé et effort faible — tableau]
 | # | Recommandation | Écran | Discipline | Effort |
 |---|---|---|---|---|
+
+## Matrice Impact / Effort
+Pour chaque recommandation, calculer :
+- Impact = moyenne des scores de priorité (critical=4, high=3, medium=2, low=1)
+- Effort = valeur numérique de effort (xs=1, s=2, m=3, l=4, xl=5)
+
+Classer en 4 quadrants :
+- **Quick Wins** (impact élevé, effort faible) : à faire en premier
+- **Projets stratégiques** (impact élevé, effort élevé) : à planifier
+- **À faire si le temps le permet** (impact faible, effort faible)
+- **À éviter** (impact faible, effort élevé)
+
+Produire un tableau markdown avec les 20 premières recommandations classées.
+
+## Contradictions détectées
+*(section incluse uniquement si `.audit/phase4/contradictions.json` existe et contient des éléments)*
+
+Ces écarts entre la vision du concepteur et ce que le code révèle méritent une attention particulière.
+[Pour chaque contradiction : claim du concepteur, preuve dans le code, interprétation, recommandation]
 ```
 
 ### Ton du rapport

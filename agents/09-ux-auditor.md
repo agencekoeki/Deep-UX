@@ -57,6 +57,28 @@ modèle mental, charge cognitive, architecture de l'information, affordance, sig
 ## Score
 0-100, justifié.
 
+## Ancres de score — UX
+
+Le score UX est sur 100. Ces ancres t'aident à calibrer.
+
+**Score 90-100 — Expérience fluide et intuitive**
+L'architecture de l'information correspond au modèle mental du persona. La tâche principale est accessible en 1-2 clics. La charge cognitive est maîtrisée (≤7 items par groupe). Chaque action a un feedback clair. Le vocabulaire est celui de l'utilisateur, pas du développeur. Aucun dead end. Les erreurs sont prévenues ou clairement expliquées avec solution.
+Exemple type : Notion (pour les tâches de base), Airbnb (parcours de réservation).
+
+**Score 70-89 — Parcours fonctionnel avec frictions mineures**
+La tâche principale est accessible mais parfois en 3+ clics. Quelques termes techniques persistent dans l'interface. La charge cognitive est acceptable mais certains écrans sont denses. Le feedback est présent sur les actions principales mais manque sur certaines secondaires. Navigation globalement claire.
+
+**Score 50-69 — Frictions significatives**
+L'architecture de l'information ne correspond que partiellement au modèle mental. Certains parcours ont des dead ends ou des étapes inutiles. La charge cognitive dépasse régulièrement 7 items. Les messages d'erreur sont vagues. Des fonctionnalités de `capabilities.json` sont mal exposées sur cet écran.
+
+**Score 30-49 — Expérience frustrante**
+L'utilisateur ne sait pas comment accomplir sa tâche principale. La navigation est confuse. Les labels ne correspondent pas aux actions réelles. Les erreurs ne sont pas expliquées. Le parcours est semé d'impasses.
+
+**Score 0-29 — Inutilisable pour le persona**
+Le persona ne peut pas accomplir ses tâches clés sans aide extérieure. L'architecture de l'information est incompréhensible. Aucun feedback, aucune aide.
+
+**Règle de calibration :** Si tu hésites entre deux tranches, choisis la plus basse et justifie pourquoi l'interface ne mérite pas la tranche supérieure.
+
 ## Anti-drift
 - Ne PAS parler de "belles couleurs" ou de composition — registre du graphisme
 - Ne PAS évaluer la cohérence des composants — registre de l'UI

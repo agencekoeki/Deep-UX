@@ -69,6 +69,36 @@ affordance, signifiant, contrainte, feedback, modèle conceptuel, heuristique, c
 ## Score
 Score global 0-100 + scores individuels par heuristique Nielsen (nielsen_scores: h1-h10).
 
+## Ancres de score — IHM
+
+### Ancres par heuristique Nielsen (chacune sur 0-10)
+
+**Score 9-10 :** L'heuristique est parfaitement respectée, implémentation exemplaire.
+**Score 7-8 :** L'heuristique est respectée avec des lacunes mineures.
+**Score 5-6 :** L'heuristique est partiellement respectée, problèmes notables.
+**Score 3-4 :** L'heuristique est largement violée, frictions importantes.
+**Score 0-2 :** L'heuristique est absente ou complètement violée.
+
+### Ancres score global IHM (0-100)
+
+**Score 90-100 — Ergonomie scientifique exemplaire**
+Toutes les heuristiques Nielsen à 8+. La loi de Fitts est respectée (cibles importantes grandes et proches). La loi de Hick est respectée (choix raisonnables avec valeurs par défaut). Les chunks respectent Miller (≤7). Tous les principes de Norman sont appliqués. WCAG AA est respecté. Navigation clavier complète.
+Exemple type : Google Search, Apple iWork.
+
+**Score 70-89 — Bon niveau ergonomique**
+La plupart des heuristiques Nielsen à 7+, maximum 2 en dessous de 6. Les lois fondamentales sont globalement respectées. Quelques touch targets trop petits. L'accessibilité est partielle (contraste OK, mais navigation clavier incomplète). Les feedbacks sont présents sur les actions principales.
+
+**Score 50-69 — Lacunes ergonomiques significatives**
+Plusieurs heuristiques Nielsen à 5 ou moins. Des violations de Fitts (boutons importants petits ou mal placés). Trop de choix simultanés (Hick violée). Des groupes >7 éléments non chunked. L'accessibilité de base est incomplète. Quelques actions sans feedback.
+
+**Score 30-49 — Problèmes ergonomiques majeurs**
+Majorité des heuristiques Nielsen en dessous de 5. L'utilisateur ne peut pas prévenir les erreurs. Pas de feedback sur les actions. Navigation clavier cassée. Contraste insuffisant. L'interface demande de la mémorisation plutôt que de la reconnaissance.
+
+**Score 0-29 — Non ergonomique**
+L'interface viole systématiquement les principes fondamentaux de l'interaction homme-machine. Aucune heuristique de Nielsen correctement implémentée. Accessibilité inexistante.
+
+**Règle de calibration :** Si tu hésites entre deux tranches, choisis la plus basse et justifie pourquoi l'interface ne mérite pas la tranche supérieure.
+
 ## Anti-drift
 - Ne PAS évaluer la beauté — évaluer l'efficacité de l'interaction
 - Ne PAS utiliser "intuitif" sans préciser pour quel profil

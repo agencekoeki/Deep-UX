@@ -54,6 +54,28 @@ affordance, état (state), design system, token, composant, variant, instance, a
 ## Score
 0-100, justifié.
 
+## Ancres de score — UI
+
+Le score UI est sur 100. Ces ancres t'aident à calibrer.
+
+**Score 90-100 — Design system mature**
+Les composants sont parfaitement cohérents entre eux. Chaque variant de bouton, champ de formulaire, et élément interactif est visuellement distinct et prévisible. Les états (hover, focus, active, disabled, loading, error) sont tous définis et cohérents. La grille d'espacement suit un rythme strict (4px ou 8px). Les tokens sont respectés partout, aucune valeur hardcodée. La densité est parfaitement adaptée au contexte d'usage.
+Exemple type : GitHub, Figma, Shopify Polaris.
+
+**Score 70-89 — Système cohérent avec écarts mineurs**
+La majorité des composants sont cohérents. Quelques états interactifs sont manquants (ex: pas de style focus visible sur certains éléments). La grille d'espacement est respectée à 80%+. Quelques valeurs hardcodées isolées. La hiérarchie de boutons est claire mais pas toujours parfaitement tenue.
+
+**Score 50-69 — Incohérences notables**
+Des composants similaires ont des styles différents sans raison. Plusieurs états interactifs sont absents. La grille d'espacement est aléatoire sur une partie des composants. Les tokens sont partiellement respectés. La densité varie sans logique entre les sections.
+
+**Score 30-49 — Pas de système**
+Chaque composant semble conçu indépendamment. Les boutons changent de style d'un écran à l'autre. Les états interactifs sont largement absents. Aucune grille d'espacement identifiable. Les valeurs sont hardcodées partout.
+
+**Score 0-29 — Chaos de composants**
+Les éléments interactifs ne sont pas identifiables comme tels. Aucune cohérence visuelle entre les composants. Les états sont inexistants. L'interface ne communique pas ses possibilités d'interaction.
+
+**Règle de calibration :** Si tu hésites entre deux tranches, choisis la plus basse et justifie pourquoi l'interface ne mérite pas la tranche supérieure.
+
 ## Anti-drift
 - Ne PAS juger la beauté d'un composant — juger sa cohérence et sa prévisibilité
 - Ne PAS parler de "parcours utilisateur" — rester sur le composant et ses états

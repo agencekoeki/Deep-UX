@@ -1,122 +1,40 @@
 {
   "name": "deep-ux",
-  "version": "1.0.0",
-  "description": "Plugin Claude Code qui audite n'importe quelle interface numérique de façon exhaustive et autonome. Sépare 5 disciplines (Graphisme, UI, UX, Web Design, IHM) avec des agents spécialisés.",
-  "commands": [
-    {
-      "name": "run",
-      "description": "Lance un audit UX complet du projet courant",
-      "file": "commands/run.md"
-    }
-  ],
+  "description": "Exhaustive UX/UI audit pipeline for Claude Code. Multi-agent, automated, grounded in your actual code. Covers Graphisme, UI, UX, Web Design, and IHM disciplines.",
+  "version": "0.2.0",
+  "author": {
+    "name": "Kōeki Agency",
+    "url": "https://koeki.fr"
+  },
+  "homepage": "https://github.com/koeki-agency/deep-ux",
+  "license": "MIT",
+  "agent": "00-orchestrator",
   "agents": [
-    {
-      "name": "orchestrator",
-      "description": "Orchestrateur principal du pipeline d'audit",
-      "file": "agents/00-orchestrator.md"
-    },
-    {
-      "name": "interview-conductor",
-      "description": "Conduit l'interview structurée du concepteur",
-      "file": "agents/01-interview-conductor.md"
-    },
-    {
-      "name": "capability-mapper",
-      "description": "Cartographie les capacités fonctionnelles du code source",
-      "file": "agents/02-capability-mapper.md"
-    },
-    {
-      "name": "token-extractor",
-      "description": "Analyse qualitative des design tokens extraits",
-      "file": "agents/03-token-extractor-agent.md"
-    },
-    {
-      "name": "persona-builder",
-      "description": "Construit des personas à partir de l'interview et de la recherche",
-      "file": "agents/04-persona-builder.md"
-    },
-    {
-      "name": "brand-auditor",
-      "description": "Audite la cohérence de l'identité de marque",
-      "file": "agents/05-brand-auditor.md"
-    },
-    {
-      "name": "benchmark-researcher",
-      "description": "Recherche des interfaces de référence dans le même secteur",
-      "file": "agents/06-benchmark-researcher.md"
-    },
-    {
-      "name": "graphisme-auditor",
-      "description": "Discipline 1 — Audite la dimension graphique pure",
-      "file": "agents/07-graphisme-auditor.md"
-    },
-    {
-      "name": "ui-auditor",
-      "description": "Discipline 2 — Audite le système de composants et design system",
-      "file": "agents/08-ui-auditor.md"
-    },
-    {
-      "name": "ux-auditor",
-      "description": "Discipline 3 — Audite l'expérience utilisateur et les parcours",
-      "file": "agents/09-ux-auditor.md"
-    },
-    {
-      "name": "webdesign-auditor",
-      "description": "Discipline 4 — Audite le responsive, la performance perçue et les standards web",
-      "file": "agents/10-webdesign-auditor.md"
-    },
-    {
-      "name": "ihm-auditor",
-      "description": "Discipline 5 — Audite l'ergonomie cognitive, les lois de l'interaction et l'accessibilité",
-      "file": "agents/11-ihm-auditor.md"
-    },
-    {
-      "name": "screen-dispatcher",
-      "description": "Lance les 5 agents d'audit pour chaque écran et consolide les résultats",
-      "file": "agents/12-screen-dispatcher.md"
-    },
-    {
-      "name": "consistency-checker",
-      "description": "Analyse la cohérence inter-écrans",
-      "file": "agents/13-consistency-checker.md"
-    },
-    {
-      "name": "functional-gap-analyst",
-      "description": "Identifie les gaps fonctionnels en croisant capabilities et personas",
-      "file": "agents/14-functional-gap-analyst.md"
-    },
-    {
-      "name": "report-generator",
-      "description": "Génère les rapports finaux en 3 formats (Markdown, JSON, HTML)",
-      "file": "agents/15-report-generator.md"
-    }
+    "00-orchestrator",
+    "00b-quality-gate",
+    "01-interview-conductor",
+    "02-capability-mapper",
+    "03-token-extractor-agent",
+    "04-persona-builder",
+    "05-brand-auditor",
+    "06-benchmark-researcher",
+    "07-graphisme-auditor",
+    "08-ui-auditor",
+    "09-ux-auditor",
+    "10-webdesign-auditor",
+    "11-ihm-auditor",
+    "12-screen-dispatcher",
+    "13-consistency-checker",
+    "14-functional-gap-analyst",
+    "15-report-generator",
+    "16-coverage-auditor",
+    "17-contradiction-detector"
+  ],
+  "commands": [
+    "run",
+    "diff"
   ],
   "skills": [
-    {
-      "name": "ux-audit",
-      "description": "Skill globale — vocabulaire, grilles d'évaluation et schéma de pensée pour l'audit UX",
-      "file": "skills/ux-audit/SKILL.md"
-    }
-  ],
-  "scripts": {
-    "bootstrap": "scripts/00-bootstrap.sh",
-    "check-deps": "scripts/01-check-deps.sh",
-    "discover": "scripts/02-discover.py",
-    "build-page-map": "scripts/03-build-page-map.py",
-    "screenshot": "scripts/04-screenshot.py",
-    "extract-tokens": "scripts/05-extract-tokens.py",
-    "export-session": "scripts/06-export-session-helper.py"
-  },
-  "schemas": [
-    "schemas/interview.schema.json",
-    "schemas/capabilities.schema.json",
-    "schemas/design-tokens.schema.json",
-    "schemas/project-map.schema.json",
-    "schemas/personas.schema.json",
-    "schemas/brand.schema.json",
-    "schemas/screen-audit.schema.json",
-    "schemas/consistency.schema.json",
-    "schemas/functional-gaps.schema.json",
-    "schemas/report-cc-tasks.schema.json"
+    "ux-audit"
   ]
 }

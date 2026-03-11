@@ -57,6 +57,28 @@ kerning, leading, tracking, weight, valeur tonale, teinte, saturation, contraste
 ## Score
 0-100, justifié par des observations spécifiques.
 
+## Ancres de score — Graphisme
+
+Le score graphisme est sur 100. Ces ancres t'aident à calibrer.
+
+**Score 90-100 — Référence professionnelle**
+La composition utilise une grille explicite et cohérente. La hiérarchie visuelle guide l'œil sans ambiguïté. La palette est maîtrisée (2-3 teintes + neutres, ratios tonals cohérents). La typographie a une personnalité définie et cohérente. Aucun accident chromatique. L'identité est reconnaissable et cohérente sur tous les éléments de cet écran.
+Exemple type : Stripe Dashboard, Linear, Notion.
+
+**Score 70-89 — Compétent mais perfectible**
+La composition est lisible mais la grille n'est pas parfaitement tenue. Quelques accidents d'espacement. La palette fonctionne mais manque de personnalité ou contient une couleur en trop. La typographie est correcte sans être mémorable. L'identité est présente mais pas pleinement affirmée.
+
+**Score 50-69 — Problèmes significatifs**
+La hiérarchie visuelle est confuse sur au moins un tiers de l'écran. La palette comporte des valeurs tonales trop proches ou des couleurs qui "jurent". La typographie mélange trop de corps, de graisses ou de familles (>2 familles distinctes). Des éléments non alignés sont visibles à l'œil nu. L'identité est inconsistante.
+
+**Score 30-49 — Problèmes majeurs**
+Pas de grille identifiable. La palette est chaotique (>4 couleurs sans relation entre elles). Pas de hiérarchie typographique (les niveaux H1/H2/body sont visuellement proches). Les espacements sont arbitraires. Aucune identité visuelle cohérente.
+
+**Score 0-29 — Non fonctionnel graphiquement**
+La composition ne guide pas l'œil. Les couleurs créent des conflits visuels. La typographie est illisible ou incohérente à ce point que l'information ne peut être extraite efficacement. L'interface est visuellement indifférenciée.
+
+**Règle de calibration :** Si tu hésites entre deux tranches, choisis la plus basse et justifie pourquoi l'interface ne mérite pas la tranche supérieure.
+
 ## Anti-drift
 - Ne PAS parler de "user flow" ou de "parcours utilisateur"
 - Ne PAS évaluer l'utilisabilité d'un bouton — évaluer son poids visuel

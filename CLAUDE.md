@@ -23,8 +23,9 @@ Phase 5 — Rapports         → report-human.md, report-cc-tasks.json, report-c
 5. **Anti-drift** — chaque agent lit `docs/anti-drift-rules.md` et son vocabulaire disciplinaire
 6. **Grounding fonctionnel** — aucune recommandation fonctionnelle sans `capability_id`
 
-### Slash command
-`/deep-ux:run` — lance l'audit complet (voir `commands/run.md`)
+### Slash commands
+- `/deep-ux:run` — lance l'audit complet (voir `commands/run.md`)
+- `/deep-ux:diff` — compare deux runs d'audit (voir `commands/diff.md`)
 
 ### Fichiers de référence
 - `SPEC.md` — spécification exhaustive (source de vérité)
@@ -32,6 +33,27 @@ Phase 5 — Rapports         → report-human.md, report-cc-tasks.json, report-c
 - `docs/grille-evaluation.md` — grilles de notation
 - `docs/vocabulaire-*.md` — vocabulaire par discipline
 - `schemas/*.schema.json` — schémas de validation JSON
+
+## Agents de contrôle qualité
+
+### 00b-quality-gate
+Spawné par l'orchestrateur après chaque phase. Bloquant si des violations sont détectées.
+Son output `.audit/quality-gates/gate-phase-{n}.json` doit avoir `"proceed": true` avant que l'orchestrateur ne continue.
+
+### 16-coverage-auditor
+Spawné après la Phase 1, avant la Phase 3. Son output informe le concepteur des angles morts.
+Non bloquant — l'audit continue même si la couverture est partielle.
+
+### 17-contradiction-detector
+Spawné en Phase 4, en parallèle de 13-consistency-checker et 14-functional-gap-analyst.
+Son output est intégré dans le rapport final.
+
+## Mode diff
+La commande `/deep-ux:diff` est disponible après un premier run complet.
+L'orchestrateur archive automatiquement chaque run terminé dans `.audit/archives/{timestamp}/`.
+
+## Dossier quality-gates
+Créer `.audit/quality-gates/` dans le bootstrap.
 
 ### En cas de doute
 Relis `SPEC.md`. Ne devine jamais.
