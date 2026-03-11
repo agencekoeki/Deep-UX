@@ -17,6 +17,9 @@ Tous les fichiers `.audit/` :
 - `.audit/phase4/consistency.json`
 - `.audit/phase4/functional-gaps.json`
 - `.audit/phase4/contradictions.json` (si existant)
+- `.audit/phase4/contextual-gaps.json` (si existant)
+- `.audit/wording-corpus.json` (si existant)
+- `.audit/screen-audits/ia-audit.json` (si existant)
 - `.audit/coverage-report.json` (si existant)
 
 ## Outputs
@@ -43,14 +46,15 @@ Elles seules pourraient améliorer significativement l'expérience utilisateur.
 2. ...
 
 ## Scores par discipline
-| Discipline | Score moyen | Min | Max |
+| Discipline | Score moyen | Meilleur écran | Pire écran |
 |---|---|---|---|
-| Graphisme | XX | XX | XX |
-| UI | XX | XX | XX |
-| UX | XX | XX | XX |
-| Web Design | XX | XX | XX |
-| IHM | XX | XX | XX |
-| **Global** | **XX** | | |
+| Graphisme | XX/100 | ... | ... |
+| UI | XX/100 | ... | ... |
+| UX | XX/100 | ... | ... |
+| Web Design | XX/100 | ... | ... |
+| IHM | XX/100 | ... | ... |
+| Wording | XX/100 | ... | ... |
+| **Global** | **XX/100** | | |
 
 ## Les 3 problèmes critiques
 [Les 3 issues les plus impactantes, avec contexte et recommandation]
@@ -67,9 +71,36 @@ Elles seules pourraient améliorer significativement l'expérience utilisateur.
 [Observations clés + recommandations]
 #### IHM (XX/100)
 [Observations clés + recommandations]
+#### Wording (XX/100)
+[Observations clés + recommandations]
 
 ## Cohérence inter-écrans
 [Score + issues principales]
+
+### Wording et terminologie cross-vues
+[Reprendre les principales incohérences terminologiques de wording-corpus.json]
+[Tableau des termes en conflit et recommandation de terme canonique]
+
+## Architecture d'information
+*(section incluse uniquement si `.audit/screen-audits/ia-audit.json` existe)*
+
+### Navigation globale
+[Reprendre l'arbre reconstruit par 19-ia-auditor avec les principaux problèmes]
+
+### Distance tâches / accès
+[Tableau des tâches clés des personas avec leur distance en clics]
+
+### Recommandations IA
+[Top 5 des recommandations de 19-ia-auditor priorisées]
+
+## Gaps contextuels — Fonctionnalités mal positionnées
+*(section incluse uniquement si `.audit/phase4/contextual-gaps.json` existe et contient des éléments)*
+
+Ces fonctionnalités existent dans le système mais sont inaccessibles là où les utilisateurs en ont besoin.
+
+[Liste des gaps critiques et hauts de contextual-gaps.json, avec le scénario]
+
+Note : Ces corrections sont souvent à effort très faible (xs ou s) pour un impact élevé.
 
 ## Gaps fonctionnels
 [Résumé des gaps identifiés]

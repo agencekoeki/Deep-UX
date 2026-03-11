@@ -76,6 +76,12 @@ Si un `capability_id` inconnu est trouvé :
 ### Conformité schema
 Chaque `screen-{n}.json` respecte `schemas/screen-audit.schema.json`.
 
+### Vérifications supplémentaires (v3)
+- `wording-corpus.json` existe et contient au moins autant d'entrées que d'écrans audités
+- Chaque `screen-{n}.json` contient une section `disciplines.wording` non vide
+- `ia-audit.json` existe et sa section `navigation_tree` n'est pas vide
+- `ia-audit.json` contient une entrée dans `task_coverage` pour chaque `key_task` de chaque persona
+
 ---
 
 ## Vérifications après Phase 4 (Cohérence)
@@ -87,6 +93,13 @@ Chaque `screen-{n}.json` respecte `schemas/screen-audit.schema.json`.
 ### functional-gaps.json
 - Chaque gap pointe vers un `capability_id` existant OU est tagué `"speculation": true`
 - Conformité au schema `schemas/functional-gaps.schema.json`
+
+### Vérifications supplémentaires (v3)
+- `contextual-gaps.json` existe
+- Chaque gap dans `contextual-gaps.json` a un `capability_id` qui existe dans `capabilities.json`
+  (violation de la règle anti-spéculation si non respecté)
+- Au moins un gap de type `missing_shortcut` ou `missing_context_info` est présent
+  (un rapport sans aucun gap contextuel est suspect — signaler en warning)
 
 ---
 

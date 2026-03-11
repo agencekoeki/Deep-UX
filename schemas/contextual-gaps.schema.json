@@ -1,0 +1,62 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "Contextual Gaps Audit",
+  "description": "Affordances contextuelles manquantes — fonctionnalités présentes ailleurs mais absentes là où le persona en aurait besoin",
+  "type": "object",
+  "required": ["generated_at", "gaps", "total", "critical_count"],
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "gaps": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "severity", "persona_id", "scenario", "current_view", "missing_affordance", "existing_location", "evidence", "recommendation"],
+        "properties": {
+          "id": { "type": "string" },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "persona_id": { "type": "string" },
+          "scenario": {
+            "type": "string",
+            "description": "Contexte d'usage : ce que le persona est en train de faire sur cette vue"
+          },
+          "current_view": {
+            "type": "string",
+            "description": "URL/path de la vue où l'affordance manque"
+          },
+          "missing_affordance": {
+            "type": "string",
+            "description": "Ce que le persona cherche et ne trouve pas sur cette vue"
+          },
+          "existing_location": {
+            "type": "string",
+            "description": "Où cette fonctionnalité existe déjà dans l'application"
+          },
+          "capability_id": { "type": "string" },
+          "evidence": {
+            "type": "string",
+            "description": "Preuve que la fonctionnalité existe (fichier source, capability_id)"
+          },
+          "recommendation": {
+            "type": "string",
+            "description": "Ce qui devrait être ajouté ou rendu accessible sur cette vue"
+          },
+          "effort": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] },
+          "type": {
+            "type": "string",
+            "enum": ["missing_shortcut", "missing_filter", "missing_export", "missing_action", "missing_context_info", "missing_navigation", "other"]
+          }
+        }
+      }
+    },
+    "total": { "type": "integer" },
+    "critical_count": { "type": "integer" },
+    "by_persona": {
+      "type": "object",
+      "description": "Nombre de gaps par persona_id"
+    },
+    "by_view": {
+      "type": "object",
+      "description": "Nombre de gaps par vue"
+    }
+  }
+}

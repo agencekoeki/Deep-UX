@@ -2650,22 +2650,22 @@ Note : Ces corrections sont souvent à effort très faible (xs ou s) pour un imp
 CC coche chaque item après création ou modification :
 
 ### Nouveaux fichiers de vocabulaire
-- [ ] `docs/vocabulaire-wording.md`
+- [x] `docs/vocabulaire-wording.md`
 
 ### Nouveaux schémas
-- [ ] `schemas/ia-audit.schema.json`
-- [ ] `schemas/contextual-gaps.schema.json`
+- [x] `schemas/ia-audit.schema.json`
+- [x] `schemas/contextual-gaps.schema.json`
 
 ### Nouveaux agents
-- [ ] `agents/18-wording-auditor.md`
-- [ ] `agents/19-ia-auditor.md`
-- [ ] `agents/20-contextual-gaps-auditor.md`
+- [x] `agents/18-wording-auditor.md`
+- [x] `agents/19-ia-auditor.md`
+- [x] `agents/20-contextual-gaps-auditor.md`
 
 ### Agents mis à jour
-- [ ] `agents/12-screen-dispatcher.md` (spawn agent 18 + score wording dans global)
-- [ ] `agents/00-orchestrator.md` (spawn agent 20 en Phase 4 + nouveaux fichiers d'état)
-- [ ] `agents/15-report-generator.md` (sections wording, IA, gaps contextuels)
-- [ ] `agents/00b-quality-gate.md` (vérifications v3)
+- [x] `agents/12-screen-dispatcher.md` (spawn agent 18 + score wording dans global)
+- [x] `agents/00-orchestrator.md` (spawn agent 20 en Phase 4 + nouveaux fichiers d'état)
+- [x] `agents/15-report-generator.md` (sections wording, IA, gaps contextuels)
+- [x] `agents/00b-quality-gate.md` (vérifications v3)
 
 ### Plugin manifest
-- [ ] `.claude-plugin/plugin.json` (v0.3.0, 22 agents)
+- [x] `.claude-plugin/plugin.json` (v0.3.0, 22 agents)

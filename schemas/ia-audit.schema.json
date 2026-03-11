@@ -1,0 +1,97 @@
+{
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "IA Audit",
+  "description": "Audit de l'architecture d'information et de la navigation globale",
+  "type": "object",
+  "required": ["generated_at", "navigation_tree", "scores", "observations", "recommendations"],
+  "properties": {
+    "generated_at": { "type": "string", "format": "date-time" },
+    "navigation_tree": {
+      "type": "array",
+      "description": "Arbre de navigation reconstruit depuis le code",
+      "items": {
+        "type": "object",
+        "required": ["label", "path", "depth", "children"],
+        "properties": {
+          "label": { "type": "string" },
+          "path": { "type": "string" },
+          "depth": { "type": "integer", "minimum": 0 },
+          "children": { "type": "array" },
+          "click_distance_from_root": { "type": "integer" },
+          "accessible_from_persona_task": { "type": "boolean" }
+        }
+      }
+    },
+    "metrics": {
+      "type": "object",
+      "properties": {
+        "max_depth": { "type": "integer" },
+        "avg_depth": { "type": "number" },
+        "top_level_items_count": { "type": "integer" },
+        "orphan_pages_count": { "type": "integer" },
+        "deepest_path": { "type": "string" }
+      }
+    },
+    "scores": {
+      "type": "object",
+      "required": ["global", "depth", "breadth", "grouping_logic", "labeling", "task_alignment"],
+      "properties": {
+        "global": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "depth": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "breadth": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "grouping_logic": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "labeling": { "type": "integer", "minimum": 0, "maximum": 100 },
+        "task_alignment": { "type": "integer", "minimum": 0, "maximum": 100 }
+      }
+    },
+    "observations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "type", "severity", "observation", "evidence"],
+        "properties": {
+          "id": { "type": "string" },
+          "type": {
+            "type": "string",
+            "enum": ["depth", "breadth", "grouping", "labeling", "orphan", "task_alignment", "jargon", "symmetry"]
+          },
+          "severity": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "observation": { "type": "string" },
+          "evidence": { "type": "string" },
+          "affected_paths": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    },
+    "task_coverage": {
+      "type": "array",
+      "description": "Pour chaque tâche clé du persona, distance en clics depuis l'accueil",
+      "items": {
+        "type": "object",
+        "required": ["persona_id", "task", "path_found", "click_count"],
+        "properties": {
+          "persona_id": { "type": "string" },
+          "task": { "type": "string" },
+          "path_found": { "type": "string" },
+          "click_count": { "type": "integer" },
+          "acceptable": { "type": "boolean" },
+          "note": { "type": "string" }
+        }
+      }
+    },
+    "recommendations": {
+      "type": "array",
+      "items": {
+        "type": "object",
+        "required": ["id", "priority", "observation", "recommendation", "effort"],
+        "properties": {
+          "id": { "type": "string" },
+          "priority": { "type": "string", "enum": ["critical", "high", "medium", "low"] },
+          "observation": { "type": "string" },
+          "recommendation": { "type": "string" },
+          "effort": { "type": "string", "enum": ["xs", "s", "m", "l", "xl"] },
+          "affected_paths": { "type": "array", "items": { "type": "string" } }
+        }
+      }
+    }
+  }
+}

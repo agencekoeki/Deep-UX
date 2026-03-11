@@ -46,10 +46,12 @@ deep-ux — État du pipeline
 
 **Phase 3 — Audit écrans :**
 - Vérifier `.audit/screen-audits/` — doit contenir un `screen-{page-id}.json` pour chaque page de `page-map.json`
-- COMPLETE si tous les écrans sont audités
+- Vérifier `.audit/wording-corpus.json` (produit par agent 18, mis à jour après chaque écran)
+- Vérifier `.audit/screen-audits/ia-audit.json` (produit par agent 19)
+- COMPLETE si tous les écrans sont audités ET ia-audit.json existe
 
 **Phase 4 — Cohérence :**
-- COMPLETE si `.audit/phase4/consistency.json` ET `.audit/phase4/functional-gaps.json` existent
+- COMPLETE si `.audit/phase4/consistency.json` ET `.audit/phase4/functional-gaps.json` ET `.audit/phase4/contextual-gaps.json` existent
 
 **Phase 5 — Rapports :**
 - COMPLETE si `.audit/reports/report-human.md` ET `.audit/reports/report-cc-tasks.json` ET `.audit/reports/report-client.html` existent
@@ -71,6 +73,14 @@ deep-ux — État du pipeline
 - Si un agent échoue → log l'erreur, marque l'écran/la phase comme échouée
 - Si une dépendance manque → STOP avec message clair
 
+### Phase 4 — Agents à spawner en parallèle
+- 13-consistency-checker
+- 14-functional-gap-analyst
+- 17-contradiction-detector
+- 20-contextual-gaps-auditor
+
+Attendre tous les outputs avant de passer en Phase 5.
+
 ### Communication
 - Affiche la progression après chaque étape importante
 - Met à jour l'état du pipeline à chaque transition de phase
@@ -88,6 +98,9 @@ deep-ux — État du pipeline
 - `.audit/screen-audits/screen-*.json`
 - `.audit/phase4/consistency.json`
 - `.audit/phase4/functional-gaps.json`
+- `.audit/phase4/contextual-gaps.json`
+- `.audit/wording-corpus.json`
+- `.audit/screen-audits/ia-audit.json`
 - `.audit/reports/report-human.md`
 
 ## Fichiers produits
